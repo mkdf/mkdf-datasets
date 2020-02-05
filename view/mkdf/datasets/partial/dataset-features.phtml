@@ -1,0 +1,29 @@
+<div class="list-group">
+    <?php
+
+    foreach ($features as $feature) {
+        if(!$this->routeAllowed($feature->getViewHref($dataset_id)) ) continue;
+
+        //echo $this->navigation()->menu()->htmlify($page) . PHP_EOL;
+        if ($feature->isActive()) {
+            echo ("<a href='#' class='list-group-item list-group-item-action active'>"). PHP_EOL;
+            echo ($feature->getLabel() . "</a>");
+        }
+        else {
+            echo ("<a href='".$feature->getViewHref($dataset_id)."' class='list-group-item list-group-item-action'>"). PHP_EOL;
+            echo ($feature->getLabel() . "</a>");
+        }
+    }
+    ?>
+
+
+
+</div>
+
+
+<style>
+    /* */
+ul.dataset-features-nav  {
+    flex-direction: row;
+}
+</style>

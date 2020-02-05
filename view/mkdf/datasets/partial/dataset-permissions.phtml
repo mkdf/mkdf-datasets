@@ -1,0 +1,115 @@
+<?php
+function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $permission) {
+    $action = ($permEnabled) ? 0 : 1;
+    $query = [
+        'action' => $action,
+        'permission' => $permission,
+        'role'  => $role_id
+    ];
+    $link = $context->url( 'dataset', ['action' => 'permissionsEdit', 'id' => $datasetID], [query => $query]  );
+    $btnClass = "btn btn-sm ";
+    if ($permEnabled) {
+        $label = "enabled";
+        $altLabel = "disable";
+        if ($buttonEnabled) {
+            $btnClass .= "btn-success";
+        }
+        else {
+            $btnClass .= "btn-outline-success disabled";
+        }
+    }
+    else {
+        $label = "disabled";
+        $altLabel = "enable";
+        if ($buttonEnabled) {
+            $btnClass .= "btn-danger";
+        }
+        else {
+            $btnClass .= "btn-outline-danger disabled";
+        }
+    }
+    $html = "<a class='".$btnClass."' href='".$link."' onmouseover='this.innerHTML=\"".$altLabel."\";' onmouseout='this.innerHTML=\"".$label."\";'>".$label."</a>";
+
+    return $html;
+}
+?>
+<table class="table">
+    <tr>
+        <th>User/Role</th>
+        <th>View</th>
+        <th>Read</th>
+        <th>Write</th>
+        <th>Delete</th>
+        <th>Grant</th>
+        <th></th>
+    </tr>
+
+    <?php
+
+
+    foreach ($permissions as $permission) {
+        if ($permission->role_id <= 0) {
+            print ("<tr class='table-secondary'>");
+        }
+        else {
+            print ("<tr class='table-info'>");
+        }
+
+        print ("<td>".$this->escapeHtml($permission->label)."</td>");
+
+        $checkYes = "<td><a class='btn btn-success btn-sm' href='#' data-toggle='tooltip' title='Disable permission' onmouseover='this.innerHTML=\"disable\";' onmouseout='this.innerHTML=\"enabled\";'>enabled</i></a></td>";
+        $checkNo = "<td><a class='btn btn-danger btn-sm' href='#' data-toggle='tooltip' title='Enable permission' onmouseover='this.innerHTML=\"enable\";' onmouseout='this.innerHTML=\"disabled\";'>disabled</i></a></td>";
+        $checkYesDisabled = "<td><a class='btn btn-outline-success disabled btn-sm'>enabled</i></a></td>";
+        $checkNoDisabled = "<td><a class='btn btn-outline-danger disabled btn-sm'>disabled</i></a></td>";
+
+        switch ($permission->role_id) {
+            case 0: //dataset owner
+                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
+                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
+                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
+                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td></td>");
+                break;
+            case -1: //logged in users
+                print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
+                print ("<td>".button($this,$permission->r,true, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
+                print ("<td>".button($this,$permission->w,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
+                print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td></td>");
+                break;
+            case -2: //anonymous
+                print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
+                print ("<td>".button($this,$permission->r,false, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
+                print ("<td>".button($this,$permission->w,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
+                print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td></td>");
+                break;
+            default:
+                //default code for all other permissions
+                print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
+                print ("<td>".button($this,$permission->r,true, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
+                print ("<td>".button($this,$permission->w,true, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
+                print ("<td>".button($this,$permission->d,true, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                print ("<td>".button($this,$permission->g,true, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                $url = $this->url( 'dataset', ['action' => 'permissionsDelete', 'id' => $permission->dataset_id], [query => ['role_id' => $permission->role_id]]  );
+                print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+        }
+
+        print ("</tr>");
+    }
+    ?>
+
+</table>
+
+<form name="addUserPermissionForm" id="addUserPermissionForm" method="POST" action="<?=$this->url( 'dataset', ['action' => 'permissionsAdd', 'id' => $permission->dataset_id]); ?>">
+    <div class="form-group">
+        <label for="inputEmail">Add a new user to the dataset permissions</label>
+        <input type="email" class="form-control" name="inputEmail" id="inputEmail" placeholder="Enter user's email">
+    </div>
+    <div class="form-group">
+        <input type="submit" name="submit" class="btn btn-primary" value="Add">
+    </div>
+</form>

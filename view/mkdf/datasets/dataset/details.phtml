@@ -1,0 +1,16 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Overview</h2>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+            <hr />
+            <?= $this->partial('mkdf/datasets/partial/view-dataset', ['dataset' => $dataset] ) ?>
+        </div>
+    </div>
+</div>
+
+

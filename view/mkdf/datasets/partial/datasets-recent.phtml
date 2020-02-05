@@ -1,0 +1,19 @@
+<table class="table">
+    <tr>
+        <th>Dataset</th>
+        <th>Date</th>
+    </tr>
+    <?php foreach ($datasets as $dataset) : ?>
+        <tr>
+        <td>
+            <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset->id]) ?>">
+                <?= $this->escapeHtml($dataset->title) ?>
+            </a>
+        </td>
+
+        <td><?= $this->escapeHtml($dataset->date_created) ?></td>
+
+        </tr>
+    <?php endforeach; ?>
+
+</table>

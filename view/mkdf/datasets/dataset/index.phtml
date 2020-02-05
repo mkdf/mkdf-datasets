@@ -1,0 +1,54 @@
+<h1>Dataset</h1>
+<?php if(@$actions): ?>
+<?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+<?php endif; ?>
+<?php
+    $myDataset = false;
+?>
+
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>UUID</th>
+        <th>Type</th>
+        <th></th>
+
+    </tr>
+    <?php foreach ($datasets as $dataset) : ?>
+        <?php
+        $myDataset = ($dataset['user_id'] == $currentUserId) ? true : false;
+            $tr = ($myDataset) ? "<tr class='table-primary'>" : "<tr>";
+        ?>
+        <?= $tr ?>
+            <td>
+                <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
+                    <?= $this->escapeHtml($dataset['id']) ?>
+                </a>
+            </td>
+            <td>
+                <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
+                    <?= $this->escapeHtml($dataset['title']) ?>
+                </a>
+            </td>
+            <td><?= $this->escapeHtml($dataset['description']) ?></td>
+            <td><?= $this->escapeHtml($dataset['uuid']) ?></td>
+            <td><?= $this->escapeHtml($dataset['type']) ?></td>
+            <td>
+                <?php
+                    if ($myDataset) {
+                        print ("<i class='fas fa-user-check'></i>");
+                    }
+                ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+
+</table>
+
+<?= $this->paginationControl($datasets,
+    'Sliding',
+    'application/partial/paginator',
+    ['route' => 'dataset']); ?>
+

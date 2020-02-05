@@ -1,0 +1,9 @@
+<h1>Delete Dataset</h1>
+<?= $this->partial('mkdf/topics/partial/messages', ['messages' => $messages] ) ?>
+<?= $this->partial('mkdf/datasets/partial/view-dataset', ['dataset' => $dataset] ) ?>
+<!-- Token: <?= $token ?> -->
+<?= $this->partial('mkdf/topics/partial/actions', [
+    'buttons'=>[
+        ['type'=>'danger','label'=>'Yes, delete this dataset', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'delete'], 'query' => ['token' => $token]],
+        ['type'=>'secondary','label'=>'No, go back please', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'details']]]
+] ); ?>
