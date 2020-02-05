@@ -7,11 +7,13 @@
 
 namespace MKDF\Datasets;
 
+use MKDF\Core\Service\AccountFeatureManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Controller\AbstractActionController;
 use MKDF\Datasets\DatasetsFeature\BasicFeature;
 use MKDF\Datasets\DatasetsFeature\PermissionsFeature;
 use MKDF\Datasets\DatasetsFeature\MetadataFeature;
+use MKDF\Datasets\DatasetsFeature\AccountDatasetsFeature;
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
 
 class Module
@@ -32,6 +34,9 @@ class Module
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(BasicFeature::class));
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(PermissionsFeature::class));
         //$featureManager->registerFeature($event->getApplication()->getServiceManager()->get(MetadataFeature::class));
+
+        $accountFeatureManager = $event->getApplication()->getServiceManager()->get(AccountFeatureManagerInterface::class);
+        $accountFeatureManager->registerFeature($event->getApplication()->getServiceManager()->get(AccountDatasetsFeature::class));
         
         $eventManager = $event->getApplication()->getEventManager();
         $sharedEventManager = $eventManager->getSharedManager();

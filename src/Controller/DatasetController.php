@@ -342,4 +342,36 @@ class DatasetController extends AbstractActionController
             throw new \Exception('Unauthorized');
         }
     }
+
+    public function mydatasetsAction() {
+        $user = $this->currentUser();
+        //anonymous/logged-out user will return an ID of -1
+        $userId = $user->getId();
+        $actions = [];
+
+        if ($userId > 0) {
+            $actions = [
+                'label' => 'Actions',
+                'class' => '',
+                'buttons' => [[ 'type' => 'primary', 'label' => 'Create a new dataset', 'icon' => 'create', 'target' => 'dataset', 'params' => ['action' => 'add']]]
+            ];
+        }
+
+        $userDatasets = $this->_repository->findUserDatasets($userId);
+
+        $paginator = new Paginator(new Adapter\ArrayAdapter($userDatasets));
+        $page = $this->params()->fromQuery('page', 1);
+        $paginator->setCurrentPageNumber($page);
+        $paginator->setItemCountPerPage(10);
+
+        return new ViewModel([
+            'message' => 'Datasets ',
+            //'datasets' => $this->datasetCollectionToArray($datasetCollection),
+            'datasets' => $paginator,
+            'user' => $user,
+            'userid' => $userId,
+            'actions' => $actions,
+            'features' => $this->accountFeatureManager()->getFeatures($userId),
+        ]);
+    }
 }

@@ -1,0 +1,42 @@
+<h1><?= "My account: Datasets" ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/core/partial/account-features', ['features' => $features] ) ?>
+        </div>
+        <div class="col-md-9">
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+            <table class="table table-striped table-bordered">
+                <tr>
+
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Type</th>
+
+
+                </tr>
+                <?php foreach ($datasets as $dataset) : ?>
+                    <tr>
+
+                        <td>
+                            <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
+                                <?= $this->escapeHtml($dataset['title']) ?>
+                            </a>
+                        </td>
+                        <td><?= $this->escapeHtml($dataset['description']) ?></td>
+                        <td><?= $this->escapeHtml($dataset['type']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+
+            </table>
+
+            <?= $this->paginationControl($datasets,
+                'Sliding',
+                'application/partial/paginator',
+                ['route' => 'dataset']); ?>
+
+        </div>
+    </div>
+</div>
+
+
