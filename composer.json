@@ -1,0 +1,24 @@
+{
+    "name": "mkdf/mkdf-datasets",
+    "description": "MKDF Data Catalogue",
+    "type": "library",
+    "require": {
+        "zendframework/zend-mvc": "^3.0.1",
+        "zendframework/zend-cache": "^2.7.1",
+        "zendframework/zend-db": "^2.8.1",
+        "zendframework/zend-mvc-form": "^1.0",
+        "mkdf/mkdf-core": "^0.9.0"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "enridaga",
+            "email": "enricodaga@gmail.com"
+        },
+        {
+            "name": "jasemk",
+            "email": "jase@jasoncarvalho.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
