@@ -40,6 +40,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
     private function buildQueries(){
         $this->_queries = [
             'allDatasets'       => 'SELECT id, title, description, uuid, user_id, date_created, date_modified FROM dataset ORDER BY date_created DESC',
+            'datasetTypes'      => 'SELECT id, name, description FROM dataset_type',
             'allVisibleDatasets'=> 'SELECT DISTINCT d.id, d.title, d.description, d.type, d.uuid, d.user_id, d.date_created, d.date_modified '.
                                     'FROM '.
                                          'dataset d, '.
@@ -55,9 +56,9 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                                         ') ORDER BY d.date_created DESC ',
             'userDatasets'      => 'SELECT id, title, description, uuid, user_id, date_created, date_modified FROM dataset '.
                 ' WHERE user_id = '.$this->fp('user_id').' ORDER BY date_created DESC',
-            'oneDataset'        => 'SELECT id, title, description, uuid, user_id FROM dataset WHERE id = ' . $this->fp('id'),
+            'oneDataset'        => 'SELECT id, title, description, uuid, user_id, type FROM dataset WHERE id = ' . $this->fp('id'),
             'datasetCount'      => 'SELECT COUNT(id) AS count FROM dataset',
-            'insertDataset'     => 'INSERT INTO dataset (title, description, uuid, user_id) VALUES ('.$this->fp('title').', '.$this->fp('description').', '.$this->fp('uuid').', '.$this->fp('user_id').')',
+            'insertDataset'     => 'INSERT INTO dataset (title, description, uuid, user_id, type) VALUES ('.$this->fp('title').', '.$this->fp('description').', '.$this->fp('uuid').', '.$this->fp('user_id').', '.$this->fp('type').')',
             'updateDataset'     => 'UPDATE dataset SET title = '.$this->fp('title').
                 ', description = '.$this->fp('description'). ', date_modified =  CURRENT_TIMESTAMP '.
                 ' WHERE id = ' .$this->fp('id'),
@@ -154,6 +155,21 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             $dataset->setProperties($result->current());
         }
         return $dataset;
+    }
+
+    public function findDatasetTypes() {
+        $datasetTypes = [];
+        $parameters = [];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetTypes'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($datasetTypes, $row);
+            }
+        }
+        return $datasetTypes;
     }
 
     public function getDatasetCount() {

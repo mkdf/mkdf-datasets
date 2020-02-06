@@ -1,9 +1,21 @@
-<p>
-    <!-- <h3><?php echo $this->escapeHtml($dataset->title) ?></h3><br /> -->
-    <?php echo $this->escapeHtml($dataset->description) ?><br />
-    <hr />
-    <strong>ID:</strong> <?php echo $this->escapeHtml($dataset->id) ?><br />
-    <strong>UUID:</strong> <?php echo $this->escapeHtml($dataset->uuid) ?><br />
+
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>Title:</th>
+            <td><?= $this->escapeHtml($dataset->title) ?></th>
+        </tr>
+        <tr>
+            <th>Description:</th>
+            <td><?= $this->escapeHtml($dataset->description) ?></th>
+        </tr>
+        <tr>
+            <th>UUID:</th>
+            <td><?= $this->escapeHtml($dataset->uuid) ?></td>
+        </tr>
+        <tr>
+            <th>Type:</th>
+            <td><?= $this->escapeHtml($dataset->type) ?></td>
+        </tr>
 
 
-</p>
+    </table>

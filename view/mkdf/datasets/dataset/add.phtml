@@ -13,7 +13,12 @@ $form->get('description')->setAttributes([
     'placeholder'=>'Dataset description'
 ]);
 
-
+$form->get('datasetTypes')->setAttributes([
+    'class'=>'form-check-input',
+]);
+$form->get('datasetTypes')->setLabelAttributes([
+    'class'=>'form-check-label',
+]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
@@ -31,6 +36,32 @@ $form->prepare();
     <?= $this->formElement($form->get('description')); ?>
     <?= $this->formElementErrors($form->get('description')); ?>
 </div>
+
+<div class="form-group">
+    <label class="form-check-label" for="<?= $form->get('datasetTypes')->getName()?>"><?= $form->get('datasetTypes')->getLabel()?></label>
+    <?php
+    $firstItem = true;
+    $radioArray = $form->get('datasetTypes')->getValueOptions();
+    foreach ($radioArray as $key => $radioItem):
+    ?>
+        <div class="form-check">
+            <?php
+            if ($firstItem) {
+                $checked = "checked";
+                $firstItem = false;
+            }
+            else {
+                $checked = "";
+            }
+            ?>
+            <input class="form-check-input" type="radio" name="<?= $form->get('datasetTypes')->getName()?>" id="<?= $key ?>" value="<?= $key ?>" <?= $checked ?>>
+            <label class="form-check-label" for="<?= $key ?>">
+                <?= $radioItem ?>
+            </label>
+        </div>
+    <?php endforeach; ?>
+</div>
+
 <div class="form-group">
     <?= $this->formElement($form->get('submit')); ?>
 </div>

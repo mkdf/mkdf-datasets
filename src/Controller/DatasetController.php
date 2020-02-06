@@ -246,7 +246,7 @@ class DatasetController extends AbstractActionController
     }
 
     public function addAction(){
-        $form = new Form\DatasetForm();
+        $form = new Form\DatasetForm($this->_repository);
         // Check if user has submitted the form
         $messages = [];
         if($this->getRequest()->isPost()) {
@@ -256,7 +256,7 @@ class DatasetController extends AbstractActionController
                 // Get User Id
                 $user_id = $this->currentUser()->getId();
                 // Write data
-                $id = $this->_repository->insertDataset(['title' => $data['title'], 'description'=>$data['description'],'user_id'=>$user_id]);
+                $id = $this->_repository->insertDataset(['title' => $data['title'], 'description'=>$data['description'],'user_id'=>$user_id,'type'=>$data['datasetTypes']]);
                 $this->_repository->setDefaultDatasetPermissions($id);
                 // Redirect to "view" page
                 $this->flashMessenger()->addSuccessMessage('A new dataset was created.');
@@ -276,18 +276,19 @@ class DatasetController extends AbstractActionController
         $can_edit = ($dataset->user_id == $user_id);
         $messages = [];
         if($can_edit){
-            $form = new Form\DatasetForm();
+            $form = new Form\DatasetForm($this->_repository);
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
+                //print_r($data);
                 $form->setData($data);
                 if($form->isValid()){
                     // Get User Id
                     $user_id = $this->currentUser()->getId();
                     // Write data
-                    $id = $this->_repository->updateDataset($id, $data['title'], $data['description']);
+                    $output = $this->_repository->updateDataset($id, $data['title'], $data['description']);
                     // Redirect to "view" page
                     $this->flashMessenger()->addSuccessMessage('The dataset was updated succesfully.');
-                    return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+                    return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id'=>$id]);
                 }else{
                     $messages[] = [ 'type'=> 'warning', 'message'=>'Please check the content of the form.'];
                 }
@@ -295,7 +296,14 @@ class DatasetController extends AbstractActionController
                 $form->setData($dataset->getProperties());
             }
             // Pass form variable to view
-            return new ViewModel(['form' => $form, 'messages' => $messages ]);
+            return new ViewModel(
+                [
+                    'form' => $form,
+                    'messages' => $messages,
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'dataset_id' => $id
+                ]
+            );
         }else{
             // FIXME Better handling security
             throw new \Exception('Unauthorized');

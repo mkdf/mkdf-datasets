@@ -1,24 +1,30 @@
 <?php
 namespace MKDF\Datasets\Form;
 
+use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
 use Zend\Form\Form;
 use Zend\Form\Element\Hidden;
 use Zend\Form\Element\Text;
 use Zend\Form\Element\Textarea;
+use Zend\Form\Element\Radio;
 use Zend\Form\Element\Submit;
 
 class DatasetForm extends Form
 {
+    private $_repository;
+
     // Constructor.
-    public function __construct()
+    public function __construct(MKDFDatasetRepositoryInterface $repository)
     {
         // Define form name
         parent::__construct('dataset-form');
         // Set POST method for this form
         $this->setAttribute('method', 'post');
 
+        $this->_repository = $repository;
         $this->addElements();
         $this->addInputFilter();
+
     }
 
     /**
@@ -41,6 +47,24 @@ class DatasetForm extends Form
             'name' => 'description',
             'options' => [
                 'label' => 'Description',
+            ],
+        ]);
+
+
+        $datasetTypes = $this->_repository->findDatasetTypes();
+        $valueOptions = [];
+        foreach ($datasetTypes as $option) {
+            $id = $option->id;
+            $label = $option->name . " - " . $option->description;
+            $valueOptions[$id] = $label;
+        }
+
+        $this->add([
+            'type' => 'radio',
+            'name' => 'datasetTypes',
+            'options' => [
+                'label' => 'Dataset type',
+                'value_options' => $valueOptions,
             ],
         ]);
 
@@ -105,6 +129,11 @@ class DatasetForm extends Form
                     ],
                 ],
             ],
+        ]);
+
+        $inputFilter->add([
+            'name'     => 'datasetTypes',
+            'required' => false,
         ]);
 
     }

@@ -1,35 +1,47 @@
 <h1>Edit dataset</h1>
+<?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset_id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <?php
+            $form = $this->form;
 
-<?php
-$form = $this->form;
+            $form->get('title')->setAttributes([
+                'class'=>'form-control',
+                'placeholder'=>'Dataset title'
+            ]);
 
-$form->get('title')->setAttributes([
-    'class'=>'form-control',
-    'placeholder'=>'Dataset title'
-]);
+            $form->get('description')->setAttributes([
+                'class'=>'form-control',
+                'placeholder'=>'Dataset description'
+            ]);
 
-$form->get('description')->setAttributes([
-    'class'=>'form-control',
-    'placeholder'=>'Dataset description'
-]);
+            $form->get('update')->setAttributes(['class'=>'btn btn-primary']);
 
-$form->get('update')->setAttributes(['class'=>'btn btn-primary']);
+            $form->prepare();
+            ?>
 
-$form->prepare();
-?>
-
-<?= $this->form()->openTag($form); ?>
-<div class="form-group">
-    <?= $this->formLabel($form->get('title')); ?>
-    <?= $this->formElement($form->get('title')); ?>
-    <?= $this->formElementErrors($form->get('title')); ?>
+            <?= $this->form()->openTag($form); ?>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('title')); ?>
+                <?= $this->formElement($form->get('title')); ?>
+                <?= $this->formElementErrors($form->get('title')); ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('description')); ?>
+                <?= $this->formElement($form->get('description')); ?>
+                <?= $this->formElementErrors($form->get('description')); ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formElement($form->get('update')); ?>
+            </div>
+            <?= $this->form()->closeTag(); ?>
+        </div>
+    </div>
 </div>
-<div class="form-group">
-    <?= $this->formLabel($form->get('description')); ?>
-    <?= $this->formElement($form->get('description')); ?>
-    <?= $this->formElementErrors($form->get('description')); ?>
-</div>
-<div class="form-group">
-    <?= $this->formElement($form->get('update')); ?>
-</div>
-<?= $this->form()->closeTag(); ?>
+
+
+
