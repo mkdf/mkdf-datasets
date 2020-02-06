@@ -15,6 +15,7 @@ use MKDF\Datasets\DatasetsFeature\PermissionsFeature;
 use MKDF\Datasets\DatasetsFeature\MetadataFeature;
 use MKDF\Datasets\DatasetsFeature\AccountDatasetsFeature;
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
+use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
 
 class Module
 {
@@ -29,6 +30,10 @@ class Module
      */
     public function onBootstrap(MvcEvent $event)
     {
+        // Initialisation
+        $repository = $event->getApplication()->getServiceManager()->get(MKDFDatasetRepositoryInterface::class);
+        $repository->init();
+        
         // Get event manager.
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(BasicFeature::class));
