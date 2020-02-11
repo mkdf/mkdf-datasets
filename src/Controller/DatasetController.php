@@ -258,6 +258,15 @@ class DatasetController extends AbstractActionController
                 // Write data
                 $id = $this->_repository->insertDataset(['title' => $data['title'], 'description'=>$data['description'],'user_id'=>$user_id,'type'=>$data['datasetTypes']]);
                 $this->_repository->setDefaultDatasetPermissions($id);
+
+                //Run through dataset features and check for additional initialisation routines.
+                $features = $this->datasetsFeatureManager()->getFeatures($id);
+                foreach ($features as $feature) {
+                    if ($feature->hasFeature($id)) {
+                        echo($feature->initialiseDataset($id));
+                    }
+                }
+
                 // Redirect to "view" page
                 $this->flashMessenger()->addSuccessMessage('A new dataset was created.');
                 return $this->redirect()->toRoute('dataset', ['action'=>'index']);

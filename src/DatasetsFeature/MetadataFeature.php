@@ -34,4 +34,7 @@ class MetadataFeature implements DatasetsFeatureInterface {
     public function setActive($bool){
         $this->active = !!$bool;
     }
+    public function initialiseDataset($dataset_id) {
+
+    }
 }

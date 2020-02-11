@@ -36,4 +36,5 @@ class AccountDatasetsFeature implements AccountFeatureInterface
     public function setActive($bool){
         $this->active = !!$bool;
     }
+
 }

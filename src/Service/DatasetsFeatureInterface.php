@@ -12,4 +12,5 @@ interface DatasetsFeatureInterface {
     public function getLabel();
     public function isActive();
     public function setActive($bool);
+    public function initialiseDataset($dataset_id);
 }
