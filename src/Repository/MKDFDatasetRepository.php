@@ -74,6 +74,8 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'datasetPermissions' => 'SELECT p.role_id, p.dataset_id, p.v, p.r, p.w, p.d, p.g, u.email AS label '
                 .'FROM dataset_permission p LEFT OUTER JOIN user u ON p.role_id = u.id '
                 .' WHERE p.dataset_id='.$this->fp('dataset_id'),
+            'datasetRolePermission' => 'SELECT v, r, w, d, g FROM dataset_permission WHERE '
+                .' dataset_id = '.$this->fp('dataset_id').' AND role_id = '.$this->fp('role_id'),
 
         ];
     }
@@ -183,6 +185,26 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             $datasetCount = (int)$currentResult['count'];
         }
         return $datasetCount;
+    }
+
+    public function findDatasetRolePermission($datasetID, $roleID) {
+        $permissions = [
+            'v' => 0,
+            'r' => 0,
+            'w' => 0,
+            'd' => 0,
+            'g' => 0
+        ];
+        $parameters = [
+            'dataset_id'    => $datasetID,
+            'role_id'       => $roleID
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetRolePermission'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $permissions = $result->current();
+        }
+        return $permissions;
     }
 
     public function findDatasetPermissions($id) {

@@ -10,6 +10,10 @@ namespace MKDF\Datasets\Controller;
 use MKDF\Datasets\Form;
 use MKDF\Datasets\Entity\Dataset;
 use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
+use MKDF\Datasets\Service\DatasetPermissionManager;
+use MKDF\Datasets\Service\DatasetPermissionManagerInterface;
+use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
+use MKDF\Datasets\Service\Factory\DatasetPermissionManagerFactory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
@@ -20,11 +24,13 @@ class DatasetController extends AbstractActionController
 {
     private $config;
     private $_repository;
+    private $_permissionManager;
 
-    public function __construct(MKDFDatasetRepositoryInterface $repository, array $config)
+    public function __construct(MKDFDatasetRepositoryInterface $repository, array $config, DatasetPermissionManager $permissionManager)
     {
         $this->config = $config;
         $this->_repository = $repository;
+        $this->_permissionManager = $permissionManager;
     }
 
     private function datasetCollectionToArray($datasetCollection) {
@@ -73,6 +79,7 @@ class DatasetController extends AbstractActionController
         $message = "Dataset: " . $id;
         $actions = [];
         $can_edit = ($dataset->user_id == $user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if ($can_edit) {
             $actions = [
                 'label' => 'Actions',

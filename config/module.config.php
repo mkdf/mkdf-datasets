@@ -15,7 +15,8 @@ return [
     'service_manager' => [
         'aliases' => [
             Repository\MKDFDatasetRepositoryInterface::class => Repository\MKDFDatasetRepository::class,
-            Service\DatasetsFeatureManagerInterface::class =>  Service\DatasetsFeatureManager::class
+            Service\DatasetsFeatureManagerInterface::class =>  Service\DatasetsFeatureManager::class,
+            Service\DatasetPermissionManagerInterface::class => Service\DatasetPermissionManager::class
         ],
         'factories' => [
             DatasetsFeature\BasicFeature::class => InvokableFactory::class,
@@ -23,7 +24,8 @@ return [
             DatasetsFeature\MetadataFeature::class => InvokableFactory::class,
             DatasetsFeature\AccountDatasetsFeature::class => InvokableFactory::class,
             Repository\MKDFDatasetRepository::class => Repository\Factory\MKFDFDatasetRepositoryFactory::class,
-            Service\DatasetsFeatureManager::class => Service\Factory\DatasetsFeatureManagerFactory::class
+            Service\DatasetsFeatureManager::class => Service\Factory\DatasetsFeatureManagerFactory::class,
+            Service\DatasetPermissionManager::class => Service\Factory\DatasetPermissionManagerFactory::class
         ]
     ],
     'router' => [
