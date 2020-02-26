@@ -78,7 +78,7 @@ class DatasetController extends AbstractActionController
         $permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
         $actions = [];
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if ($can_edit) {
             $actions = [
@@ -91,13 +91,19 @@ class DatasetController extends AbstractActionController
                 ]
             ];
         }
-        return new ViewModel([
-            'message' => $message,
-            'dataset' => $dataset,
-            'permissions' => $permissions,
-            'features' => $this->datasetsFeatureManager()->getFeatures($id),
-            'actions' => $actions
+        if ($can_view) {
+            return new ViewModel([
+                'message' => $message,
+                'dataset' => $dataset,
+                'permissions' => $permissions,
+                'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                'actions' => $actions
             ]);
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+        }
     }
 
     public function metadataDetailsAction() {
@@ -108,7 +114,8 @@ class DatasetController extends AbstractActionController
         $metadata = [];
         $message = "Dataset: " . $id;
         $actions = [];
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if ($can_edit) {
             $actions = [
                 'label' => 'Actions',
@@ -118,20 +125,27 @@ class DatasetController extends AbstractActionController
                 ]
             ];
         }
-        return new ViewModel([
-            'message' => $message,
-            'dataset' => $dataset,
-            'metadata' => $metadata,
-            'features' => $this->datasetsFeatureManager()->getFeatures($id),
-            'actions' => $actions
-        ]);
+        if ($can_view) {
+            return new ViewModel([
+                'message' => $message,
+                'dataset' => $dataset,
+                'metadata' => $metadata,
+                'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                'actions' => $actions
+            ]);
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+        }
+
     }
     
     public function permissionsDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if ($can_edit) {
             $permissions = $this->_repository->findDatasetPermissions($id);
             $message = "Dataset: " . $id;
@@ -153,7 +167,7 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
 
-        $can_edit = ($dataset->user_id == $user_id); //FIXME also check for users that have grant access plus admin users
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id); //FIXME also check for users that have grant access plus admin users
         if($can_edit){
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
@@ -289,7 +303,7 @@ class DatasetController extends AbstractActionController
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $messages = [];
         if($can_edit){
             $form = new Form\DatasetForm($this->_repository);
@@ -334,7 +348,7 @@ class DatasetController extends AbstractActionController
             throw new \Exception('Not found');
         }
         $user_id = $this->currentUser()->getId();
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $container = new Container('Dataset_Management');
         $valid_token = ($container->delete_token == $token);
         if($can_edit && $valid_token){
@@ -353,7 +367,7 @@ class DatasetController extends AbstractActionController
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if($can_edit){
             $token = uniqid(true);
             $container = new Container('Dataset_Management');

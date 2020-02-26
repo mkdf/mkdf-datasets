@@ -14,25 +14,71 @@ class DatasetPermissionManager
         $this->_repository = $repository;
     }
 
-    public function canView($datasetID, $userID) {
-
-        return false;
+    public function canView($dataset, $userID) {
+        $datasetID = $dataset->id;
+        if ($userID == -1){ //not logged in (anonymous)
+            $roleID = -2; //This is the roleID for anonymous users
+        }
+        elseif($userID == $dataset->user_id){
+            //dataset owner
+            return true;
+        }
+        else {
+            $roleID = $userID;
+        }
+        $permissions = $this->_repository->findDatasetRolePermission($datasetID,$roleID);
+        if (!$permissions) {
+            $permissions = $this->_repository->findDatasetRolePermission($datasetID,-1); //check generic 'logged_in" permissions
+        }
+        return $permissions['v'];
     }
 
-    public function canRead($datasetID, $userID) {
-        return false;
+    public function canRead($dataset, $userID) {
+        $datasetID = $dataset->id;
+        if ($userID == -1){ //not logged in (anonymous)
+            $roleID = -2; //This is the roleID for anonymous users
+        }
+        elseif($userID == $dataset->user_id){
+            //dataset owner
+            return true;
+        }
+        else {
+            $roleID = $userID;
+        }
+        $permissions = $this->_repository->findDatasetRolePermission($datasetID,$roleID);
+        if (!$permissions) {
+            $permissions = $this->_repository->findDatasetRolePermission($datasetID,-1); //check generic 'logged_in" permissions
+        }
+        return $permissions['r'];
     }
 
-    public function canWrite($datasetID, $userID) {
-        return false;
+    public function canWrite($dataset, $userID) {
+        $datasetID = $dataset->id;
+        if ($userID == -1){ //not logged in (anonymous)
+            $roleID = -2; //This is the roleID for anonymous users
+        }
+        elseif($userID == $dataset->user_id){
+            //dataset owner
+            return true;
+        }
+        else {
+            $roleID = $userID;
+        }
+        $permissions = $this->_repository->findDatasetRolePermission($datasetID,$roleID);
+        return $permissions['w'];
     }
 
+    /*
+     * This is driven by the 'delete' permission, since someone who
+     * can delete a dataset can also edit its contents.
+     */
     public function canEdit($dataset, $userID) {
         $datasetID = $dataset->id;
         if ($userID == -1){
             $roleID = -2; //This is the roleID for anonymous users
         }
         elseif($userID == $dataset->user_id){
+            //dataset owner
             return true;
         }
         else {
