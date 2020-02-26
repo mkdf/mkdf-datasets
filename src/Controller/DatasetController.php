@@ -80,17 +80,19 @@ class DatasetController extends AbstractActionController
         $actions = [];
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $can_delete = $this->_permissionManager->canDelete($dataset,$user_id);
+        $actions = [
+            'label' => 'Actions',
+            'class' => '',
+            'buttons' => []
+        ];
         if ($can_edit) {
-            $actions = [
-                'label' => 'Actions',
-                'class' => '',
-                'buttons' => [
-                    //['type'=>'info','label'=>'Subscribe', 'icon'=>'subscribe', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'subscribe']],
-                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'edit']],
-                    ['type'=>'danger','label'=>'Delete', 'icon'=>'delete', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'delete-confirm']]
-                ]
-            ];
+            $actions['buttons'][] = ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'edit']];
         }
+        if ($can_delete) {
+            $actions['buttons'][] = ['type'=>'danger','label'=>'Delete', 'icon'=>'delete', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'delete-confirm']];
+        }
+
         if ($can_view) {
             return new ViewModel([
                 'message' => $message,
@@ -167,7 +169,7 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
 
-        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id); //FIXME also check for users that have grant access plus admin users
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if($can_edit){
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
@@ -228,7 +230,7 @@ class DatasetController extends AbstractActionController
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
         }
 
-        $can_edit = ($dataset->user_id == $user_id); //FIXME also check for users that have grant access plus admin users
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $messages = [];
         if($can_edit){
             $this->_repository->updateDatasetPermission($id, $roleId, $permission, (int)$action);
@@ -253,7 +255,7 @@ class DatasetController extends AbstractActionController
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
         }
 
-        $can_edit = ($dataset->user_id == $user_id); //FIXME also check for users that have delete access plus admin users
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $messages = [];
         if($can_edit){
             $this->_repository->deleteDatasetPermissions($id, $roleId);
@@ -335,8 +337,8 @@ class DatasetController extends AbstractActionController
                 ]
             );
         }else{
-            // FIXME Better handling security
-            throw new \Exception('Unauthorized');
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id' => $id]);
         }
     }
 
@@ -349,9 +351,10 @@ class DatasetController extends AbstractActionController
         }
         $user_id = $this->currentUser()->getId();
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $can_delete = $this->_permissionManager->canDelete($dataset,$user_id);
         $container = new Container('Dataset_Management');
         $valid_token = ($container->delete_token == $token);
-        if($can_edit && $valid_token){
+        if($can_delete && $valid_token){
             $outcome = $this->_repository->deleteDataset($id);
             unset($container->delete_token);
             $this->flashMessenger()->addSuccessMessage('The dataset was deleted succesfully.');
@@ -368,7 +371,8 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
-        if($can_edit){
+        $can_delete = $this->_permissionManager->canDelete($dataset,$user_id);
+        if($can_delete){
             $token = uniqid(true);
             $container = new Container('Dataset_Management');
             $container->delete_token = $token;

@@ -68,11 +68,23 @@ class DatasetPermissionManager
         return $permissions['w'];
     }
 
-    /*
-     * This is driven by the 'delete' permission, since someone who
-     * can delete a dataset can also edit its contents.
-     */
     public function canEdit($dataset, $userID) {
+        $datasetID = $dataset->id;
+        if ($userID == -1){
+            $roleID = -2; //This is the roleID for anonymous users
+        }
+        elseif($userID == $dataset->user_id){
+            //dataset owner
+            return true;
+        }
+        else {
+            $roleID = $userID;
+        }
+        $permissions = $this->_repository->findDatasetRolePermission($datasetID,$roleID);
+        return $permissions['g'];
+    }
+
+    public function canDelete($dataset, $userID) {
         $datasetID = $dataset->id;
         if ($userID == -1){
             $roleID = -2; //This is the roleID for anonymous users

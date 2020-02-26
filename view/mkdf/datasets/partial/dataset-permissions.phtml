@@ -40,7 +40,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
         <th>Read</th>
         <th>Write</th>
         <th>Delete</th>
-        <th>Grant</th>
+        <th>Admin</th>
         <th></th>
     </tr>
 
@@ -68,7 +68,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
-                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 print ("<td></td>");
                 break;
             case -1: //logged in users
@@ -76,7 +76,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,$permission->r,true, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,$permission->w,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
                 print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
-                print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 print ("<td></td>");
                 break;
             case -2: //anonymous
@@ -84,7 +84,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,$permission->r,false, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,$permission->w,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
                 print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
-                print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 print ("<td></td>");
                 break;
             default:
@@ -92,8 +92,8 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
                 print ("<td>".button($this,$permission->r,true, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,$permission->w,true, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
-                print ("<td>".button($this,$permission->d,true, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
-                print ("<td>".button($this,$permission->g,true, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //grant
+                print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                print ("<td>".button($this,$permission->g,true, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 $url = $this->url( 'dataset', ['action' => 'permissionsDelete', 'id' => $permission->dataset_id], [query => ['role_id' => $permission->role_id]]  );
                 print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
         }
