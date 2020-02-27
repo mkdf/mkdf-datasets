@@ -43,6 +43,16 @@ return [
                         'action'        => 'index',
                     ],
                 ]
+            ],
+            'my-account/mydatasets' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/my-account/mydatasets',
+                    'defaults' => [
+                        'controller'    => Controller\DatasetController::class,
+                        'action'        => 'mydatasets',
+                    ],
+                ]
             ]
         ],
     ],

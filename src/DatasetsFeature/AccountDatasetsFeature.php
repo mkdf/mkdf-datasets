@@ -18,10 +18,10 @@ class AccountDatasetsFeature implements AccountFeatureInterface
         return 'mydatasets';
     }
     public function getViewHref(){
-        return '/dataset/mydatasets';
+        return '/my-account/mydatasets';
     }
     public function getEditHref(){
-        return '/dataset/mydatasets';
+        return '/my-account/mydatasets';
     }
     public function hasFeature(){
         // They all have this one

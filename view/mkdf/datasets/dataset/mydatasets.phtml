@@ -30,10 +30,15 @@
 
             </table>
 
+
             <?= $this->paginationControl($datasets,
                 'Sliding',
                 'application/partial/paginator',
-                ['action' => 'mydatasets']); ?>
+                [
+                    'route' => 'my-account',
+                    'action' => 'mydatasets'
+                ]);
+            ?>
 
         </div>
     </div>
