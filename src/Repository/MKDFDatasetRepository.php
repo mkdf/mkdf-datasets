@@ -330,11 +330,11 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $parameters = [
             'dataset_id'    => $datasetId,
             'role_id'       => $roleId,
-            'v'        => $v,
-            'r'        => $r,
-            'w'        => $w,
-            'd'        => $d,
-            'g'        => $g
+            'v'        => $v, //view in catalogue
+            'r'        => $r, //read (data)
+            'w'        => $w, //write (data)
+            'd'        => $d, //delete (from catalogue)
+            'g'        => $g //admin/grant (make changes to catalogue entry)
         ];
         $statement = $this->_adapter->createStatement($this->getQuery('insertPermission'));
         $statement->execute($parameters);
@@ -379,6 +379,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
     function deleteDataset($id) {
         $statement = $this->_adapter->createStatement($this->getQuery('deleteDataset'));
         $outcome = $statement->execute(['id'=>$id]);
+        //FIXME - Backend streams are not deleted. Review this decision.
         return true;
     }
     

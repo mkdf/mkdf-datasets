@@ -291,8 +291,8 @@ class DatasetController extends AbstractActionController
                 }
 
                 // Redirect to "view" page
-                $this->flashMessenger()->addSuccessMessage('A new dataset was created.');
-                return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+                $this->flashMessenger()->addSuccessMessage('New dataset was created.');
+                return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id' => $id]);
             }else{
                 $messages[] = [ 'type'=> 'warning', 'message'=>'Please check the content of the form.'];
             }
