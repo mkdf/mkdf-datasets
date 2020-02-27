@@ -13,16 +13,16 @@ class PermissionsFeature implements DatasetsFeatureInterface {
         return 'permissions-details';
     }
     public function getEditAction(){
-        return 'permissions-edit';
+        return 'permissions-details';
     }
     public function getViewHref($dataset_id){
         return '/dataset/permissions-details/' . $dataset_id;
     }
     public function getEditHref($dataset_id){
-        return '/dataset/permissions-edit/' . $dataset_id;
+        return '/dataset/permissions-details/' . $dataset_id;
     }
     public function hasFeature($dataset_id){
-        // They all have this one
+        // Only return true if the current user has admin rights on this dataset
         return true;
     }
     public function getLabel(){
