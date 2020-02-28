@@ -7,7 +7,7 @@ use MKDF\Datasets\Service\DatasetsFeatureInterface;
 class BasicFeature implements DatasetsFeatureInterface {
     private $active = false;
     public function getController(){
-        return \DatahubDatasets\Controller\DatasetController::class;
+        return \MKDF\Datasets\Controller\DatasetController::class;
     }
     public function getViewAction(){
         return 'details';

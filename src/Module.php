@@ -59,7 +59,6 @@ class Module
         $actionName = $event->getRouteMatch()->getParam('action', null);
         // Set active dataset feature
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
-        //print_r($featureManager->getFeatures() );
         foreach($featureManager->getFeatures() as $f){
             if($f->getController() == $controllerName && ($f->getViewAction() == $actionName || $f->getEditAction() == $actionName)){
                 $f->setActive(true);
