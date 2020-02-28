@@ -11,14 +11,14 @@
         <th>ID</th>
         <th>Title</th>
         <th>Description</th>
-        <th>UUID</th>
+        <!--<th>UUID</th>-->
         <th>Type</th>
         <th></th>
 
     </tr>
     <?php foreach ($datasets as $dataset) : ?>
         <?php
-        $myDataset = ($dataset['user_id'] == $currentUserId) ? true : false;
+            $myDataset = ($dataset['user_id'] == $currentUserId) ? true : false;
             $tr = ($myDataset) ? "<tr class='table-primary'>" : "<tr>";
         ?>
         <?= $tr ?>
@@ -33,8 +33,8 @@
                 </a>
             </td>
             <td><?= $this->escapeHtml($dataset['description']) ?></td>
-            <td><?= $this->escapeHtml($dataset['uuid']) ?></td>
-            <td><?= $this->escapeHtml($dataset['type']) ?></td>
+            <!--<td><?= $this->escapeHtml($dataset['uuid']) ?></td>-->
+            <td><?= $this->escapeHtml($dataset['typelabel']) ?></td>
             <td>
                 <?php
                     if ($myDataset) {

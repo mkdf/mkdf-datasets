@@ -42,12 +42,14 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'isReady'           => 'SELECT ID FROM dataset LIMIT 1',
             'allDatasets'       => 'SELECT id, title, description, uuid, user_id, date_created, date_modified FROM dataset ORDER BY date_created DESC',
             'datasetTypes'      => 'SELECT id, name, description FROM dataset_type',
-            'allVisibleDatasets'=> 'SELECT DISTINCT d.id, d.title, d.description, d.type, d.uuid, d.user_id, d.date_created, d.date_modified '.
+            'allVisibleDatasets'=> 'SELECT DISTINCT d.id, d.title, d.description, d.type, t.name AS typelabel, d.uuid, d.user_id, d.date_created, d.date_modified '.
                                     'FROM '.
                                          'dataset d, '.
-                                         'dataset_permission dp '.
+                                         'dataset_permission dp, '.
+                                         'dataset_type t '.
                                    'WHERE '.
                                           'd.id = dp.dataset_id AND '.
+                                          'd.type = t.id AND '.
                                         '('.
                                           '(dp.role_id = '.$this->fp('login_status').' AND dp.v = 1) '.
                                             ' OR '.
