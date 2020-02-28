@@ -53,21 +53,28 @@ class DatasetController extends AbstractActionController
                 'class' => '',
                 'buttons' => [[ 'type' => 'primary', 'label' => 'Create a new dataset', 'icon' => 'create', 'target' => 'dataset', 'params' => ['action' => 'add']]]
             ];
-        } 
+        }
 
-        $datasetCollection = $this->_repository->findAllDatasets($userId);
+        $txtSearch = $this->params()->fromQuery('txt', "");
+        if ($txtSearch == ""){
+            $datasetCollection = $this->_repository->findAllDatasets($userId);
+        }
+        else{
+            $datasetCollection = $this->_repository->findAllDatasets($userId,$txtSearch);
+        }
+
 
         $paginator = new Paginator(new Adapter\ArrayAdapter($this->datasetCollectionToArray($datasetCollection)));
         $page = $this->params()->fromQuery('page', 1);
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage(10);
-
         return new ViewModel([
             'message' => 'Datasets ',
-            //'datasets' => $this->datasetCollectionToArray($datasetCollection),
             'datasets' => $paginator,
             'currentUserId' => $user->getId(),
-            'actions' => $actions
+            'actions' => $actions,
+            'url_params' => $this->params()->fromQuery(),
+            'txt_search' => $txtSearch,
         ]);
     }
 

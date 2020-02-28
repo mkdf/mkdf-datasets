@@ -44,12 +44,11 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'datasetTypes'      => 'SELECT id, name, description FROM dataset_type',
             'allVisibleDatasets'=> 'SELECT DISTINCT d.id, d.title, d.description, d.type, t.name AS typelabel, d.uuid, d.user_id, d.date_created, d.date_modified '.
                                     'FROM '.
-                                         'dataset d, '.
-                                         'dataset_permission dp, '.
-                                         'dataset_type t '.
+                                         'dataset d '.
+                                         'JOIN dataset_permission dp ON d.id = dp.dataset_id '.
+                                         'LEFT JOIN dataset_type t ON d.type = t.id '.
                                    'WHERE '.
-                                          'd.id = dp.dataset_id AND '.
-                                          'd.type = t.id AND '.
+
                                         '('.
                                           '(dp.role_id = '.$this->fp('login_status').' AND dp.v = 1) '.
                                             ' OR '.
@@ -57,6 +56,21 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                                             ' OR '.
                                           '(dp.role_id = '.$this->fp('user_id').' AND dp.v = 1)'.
                                         ') ORDER BY d.date_created DESC ',
+            'allVisibleDatasetsFilter'=> 'SELECT DISTINCT d.id, d.title, d.description, d.type, t.name AS typelabel, d.uuid, d.user_id, d.date_created, d.date_modified '.
+                                        'FROM '.
+                                            'dataset d '.
+                                        'JOIN dataset_permission dp ON d.id = dp.dataset_id '.
+                                        'LEFT JOIN dataset_type t ON d.type = t.id '.
+                                        'WHERE '.
+
+                                            '(d.title LIKE '.$this->fp('search_title').' OR d.description LIKE '.$this->fp('search_desc').') AND '.
+                                            '('.
+                                                '(dp.role_id = '.$this->fp('login_status').' AND dp.v = 1) '.
+                                                ' OR '.
+                                                '(d.user_id = '.$this->fp('user_id').' AND dp.role_id = '.$this->fp('logged_in_identifier').')'.
+                                                ' OR '.
+                                                '(dp.role_id = '.$this->fp('user_id').' AND dp.v = 1)'.
+                                            ') ORDER BY d.date_created DESC ',
             'userDatasets'      => 'SELECT id, title, description, uuid, user_id, date_created, date_modified, type FROM dataset '.
                 ' WHERE user_id = '.$this->fp('user_id').' ORDER BY date_created DESC',
             'oneDataset'        => 'SELECT id, title, description, uuid, user_id, type FROM dataset WHERE id = ' . $this->fp('id'),
@@ -90,7 +104,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         return $this->_queries[$query];
     }
 
-    public function findAllDatasets($userId = -1, $limit = 0) {
+    public function findAllDatasets($userId = -1, $txtSearch = "", $limit = 0) {
         $datasetCollection = [];
         if ($userId > 0) {
             $loginStatus = -1; //signifies logged in, in roles table
@@ -99,12 +113,26 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             $loginStatus = -2; //as per roles in roles table
             $userId = -2; //if not logged in, use -2 (anonymous) to query against the role permissions
         }
-        $parameters = [
-            'login_status'  => $loginStatus,
-            'user_id'       => $userId,
-            'logged_in_identifier' => -1
-        ];
-        $query = $this->getQuery('allVisibleDatasets');
+
+        if ($txtSearch != ""){
+            $parameters = [
+                'login_status'  => $loginStatus,
+                'user_id'       => $userId,
+                'logged_in_identifier' => -1,
+                'search_title' => '%'.$txtSearch.'%',
+                'search_desc' => '%'.$txtSearch.'%'
+            ];
+            $query = $this->getQuery('allVisibleDatasetsFilter');
+        }
+        else{
+            $parameters = [
+                'login_status'  => $loginStatus,
+                'user_id'       => $userId,
+                'logged_in_identifier' => -1
+            ];
+            $query = $this->getQuery('allVisibleDatasets');
+        }
+
         if ($limit > 0) {
             $query = $this->addQueryLimit($query, $limit);
         }
