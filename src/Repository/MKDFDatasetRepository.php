@@ -71,7 +71,8 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                                                 ' OR '.
                                                 '(dp.role_id = '.$this->fp('user_id').' AND dp.v = 1)'.
                                             ') ORDER BY d.date_created DESC ',
-            'userDatasets'      => 'SELECT id, title, description, uuid, user_id, date_created, date_modified, type FROM dataset '.
+            'userDatasets'      => 'SELECT d.id, d.title, d.description, d.uuid, d.user_id, d.date_created, d.date_modified, d.type, t.name AS typelabel FROM dataset d '.
+                'LEFT JOIN dataset_type t ON d.type = t.id '.
                 ' WHERE user_id = '.$this->fp('user_id').' ORDER BY date_created DESC',
             'oneDataset'        => 'SELECT id, title, description, uuid, user_id, type FROM dataset WHERE id = ' . $this->fp('id'),
             'datasetCount'      => 'SELECT COUNT(id) AS count FROM dataset',
