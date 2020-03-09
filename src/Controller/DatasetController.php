@@ -364,7 +364,7 @@ class DatasetController extends AbstractActionController
         if($can_delete && $valid_token){
             $outcome = $this->_repository->deleteDataset($id);
             unset($container->delete_token);
-            $this->flashMessenger()->addSuccessMessage('The dataset was deleted succesfully.');
+            $this->flashMessenger()->addSuccessMessage('The dataset was deleted successfully.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }else{
             // FIXME Better handling security
