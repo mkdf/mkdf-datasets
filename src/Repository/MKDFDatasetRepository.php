@@ -410,7 +410,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
     function deleteDataset($id) {
         $statement = $this->_adapter->createStatement($this->getQuery('deleteDataset'));
         $outcome = $statement->execute(['id'=>$id]);
-        //FIXME - Backend streams are not deleted. Review this decision.
+        //FIXME - Backend streams and files are not deleted. Review this decision...
         return true;
     }
     
