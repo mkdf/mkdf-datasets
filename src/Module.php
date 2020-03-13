@@ -37,8 +37,8 @@ class Module
         // Get event manager.
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(BasicFeature::class));
+        $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(MetadataFeature::class));
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(PermissionsFeature::class));
-        //$featureManager->registerFeature($event->getApplication()->getServiceManager()->get(MetadataFeature::class));
 
         $accountFeatureManager = $event->getApplication()->getServiceManager()->get(AccountFeatureManagerInterface::class);
         $accountFeatureManager->registerFeature($event->getApplication()->getServiceManager()->get(AccountDatasetsFeature::class));

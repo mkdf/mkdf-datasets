@@ -114,41 +114,6 @@ class DatasetController extends AbstractActionController
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
     }
-
-    public function metadataDetailsAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        $dataset = $this->_repository->findDataset($id);
-        $user_id = $this->currentUser()->getId();
-        $permissions = $this->_repository->findDatasetPermissions($id);
-        $metadata = [];
-        $message = "Dataset: " . $id;
-        $actions = [];
-        $can_view = $this->_permissionManager->canView($dataset,$user_id);
-        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
-        if ($can_edit) {
-            $actions = [
-                'label' => 'Actions',
-                'class' => '',
-                'buttons' => [
-                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'edit']],
-                ]
-            ];
-        }
-        if ($can_view) {
-            return new ViewModel([
-                'message' => $message,
-                'dataset' => $dataset,
-                'metadata' => $metadata,
-                'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'actions' => $actions
-            ]);
-        }
-        else {
-            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
-            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
-        }
-
-    }
     
     public function permissionsDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
@@ -422,5 +387,40 @@ class DatasetController extends AbstractActionController
             'actions' => $actions,
             'features' => $this->accountFeatureManager()->getFeatures($userId),
         ]);
+    }
+
+    public function metadataDetailsAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $user_id = $this->currentUser()->getId();
+        //$permissions = $this->_repository->findDatasetPermissions($id);
+        $metadata = $this->_repository->findDatasetMetadata($id);
+        $message = "Dataset: " . $id;
+        $actions = [];
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        if ($can_edit) {
+            $actions = [
+                'label' => 'Actions',
+                'class' => '',
+                'buttons' => [
+                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'metadataEdit']],
+                ]
+            ];
+        }
+        if ($can_view) {
+            return new ViewModel([
+                'message' => $message,
+                'dataset' => $dataset,
+                'metadata' => $metadata,
+                'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                'actions' => $actions
+            ]);
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+        }
+
     }
 }

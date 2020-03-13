@@ -93,6 +93,9 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                 .' WHERE p.dataset_id='.$this->fp('dataset_id'),
             'datasetRolePermission' => 'SELECT v, r, w, d, g FROM dataset_permission WHERE '
                 .' dataset_id = '.$this->fp('dataset_id').' AND role_id = '.$this->fp('role_id'),
+            'datasetMetadata' => 'SELECT m.name, m.description, dm.value FROM dataset__metadata dm '.
+                'JOIN metadata m ON dm.meta_id = m.id '.
+                'WHERE dataset_id = '.$this->fp('dataset_id'),
 
         ];
     }
@@ -283,6 +286,23 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $statement->execute($data);
         $id = $this->_adapter->getDriver()->getLastGeneratedValue();
         return $id;
+    }
+
+    public function findDatasetMetadata($id){
+        $metadata = [];
+        $parameters = [
+            'dataset_id' => $id,
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetMetadata'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($metadata, $row);
+            }
+        }
+        return $metadata;
     }
 
     /**
