@@ -405,6 +405,7 @@ class DatasetController extends AbstractActionController
                 'class' => '',
                 'buttons' => [
                     ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'metadataEdit']],
+                    ['type'=>'warning','label'=>'Add', 'icon'=>'create', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'metadataAdd']],
                 ]
             ];
         }
