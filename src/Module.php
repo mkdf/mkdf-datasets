@@ -8,6 +8,7 @@
 namespace MKDF\Datasets;
 
 use MKDF\Core\Service\AccountFeatureManagerInterface;
+use MKDF\Datasets\DatasetsFeature\GeospatialFeature;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Controller\AbstractActionController;
 use MKDF\Datasets\DatasetsFeature\BasicFeature;
@@ -37,7 +38,7 @@ class Module
         // Get event manager.
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(BasicFeature::class));
-        $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(MetadataFeature::class));
+        $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(GeospatialFeature::class));
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(PermissionsFeature::class));
 
         $accountFeatureManager = $event->getApplication()->getServiceManager()->get(AccountFeatureManagerInterface::class);

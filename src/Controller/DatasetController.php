@@ -389,7 +389,7 @@ class DatasetController extends AbstractActionController
         ]);
     }
 
-    public function metadataDetailsAction() {
+    public function geospatialDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
@@ -404,8 +404,7 @@ class DatasetController extends AbstractActionController
                 'label' => 'Actions',
                 'class' => '',
                 'buttons' => [
-                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'metadataEdit']],
-                    ['type'=>'warning','label'=>'Add', 'icon'=>'create', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'metadataAdd']],
+                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'geospatialEdit']],
                 ]
             ];
         }

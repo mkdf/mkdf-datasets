@@ -96,6 +96,10 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'datasetMetadata' => 'SELECT m.name, m.description, dm.value FROM dataset__metadata dm '.
                 'JOIN metadata m ON dm.meta_id = m.id '.
                 'WHERE dataset_id = '.$this->fp('dataset_id'),
+            'datasetGeospatial' => 'SELECT m.name, m.description, dm.value FROM dataset__metadata dm '.
+                'JOIN metadata m ON dm.meta_id = m.id '.
+                'WHERE dataset_id = '.$this->fp('dataset_id').
+                ' AND (m.name = "latitude" OR m.name = "longitude")',
 
         ];
     }
@@ -294,6 +298,23 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'dataset_id' => $id,
         ];
         $statement = $this->_adapter->createStatement($this->getQuery('datasetMetadata'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($metadata, $row);
+            }
+        }
+        return $metadata;
+    }
+
+    public function findDatasetGeospatial($id){
+        $metadata = [];
+        $parameters = [
+            'dataset_id' => $id,
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetGeospatial'));
         $result    = $statement->execute($parameters);
         if ($result instanceof ResultInterface && $result->isQueryResult()) {
             $resultSet = new ResultSet;

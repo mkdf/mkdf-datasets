@@ -5,16 +5,10 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
+            <h2>Location information</h2>
             <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+            <?php if (count($metadata) > 0): ?>
             <table class="table table-bordered">
-                <tr class="table-active">
-
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Value</th>
-
-
-                </tr>
                 <?php foreach ($metadata as $metaEntry) : ?>
                     <tr>
 
@@ -25,6 +19,13 @@
                 <?php endforeach; ?>
 
             </table>
+            <?php else: ?>
+                <div class="card">
+                    <div class="card-body">
+                        <em>No location information currently associated with this dataset</em>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

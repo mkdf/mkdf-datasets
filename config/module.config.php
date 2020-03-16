@@ -21,7 +21,7 @@ return [
         'factories' => [
             DatasetsFeature\BasicFeature::class => InvokableFactory::class,
             DatasetsFeature\PermissionsFeature::class => InvokableFactory::class,
-            DatasetsFeature\MetadataFeature::class => InvokableFactory::class,
+            DatasetsFeature\GeospatialFeature::class => InvokableFactory::class,
             DatasetsFeature\AccountDatasetsFeature::class => InvokableFactory::class,
             Repository\MKDFDatasetRepository::class => Repository\Factory\MKFDFDatasetRepositoryFactory::class,
             Service\DatasetsFeatureManager::class => Service\Factory\DatasetsFeatureManagerFactory::class,
