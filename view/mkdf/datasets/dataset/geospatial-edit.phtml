@@ -1,0 +1,47 @@
+<h1>Edit dataset location</h1>
+<?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset_id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <?php
+            $form = $this->form;
+
+            $form->get('latitude')->setAttributes([
+                'class'=>'form-control',
+                'placeholder'=>'Latitude'
+            ]);
+
+            $form->get('longitude')->setAttributes([
+                'class'=>'form-control',
+                'placeholder'=>'Longitude'
+            ]);
+
+            $form->get('update')->setAttributes(['class'=>'btn btn-primary']);
+
+            $form->prepare();
+            ?>
+
+            <?= $this->form()->openTag($form); ?>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('latitude')); ?>
+                <?= $this->formElement($form->get('latitude')); ?>
+                <?= $this->formElementErrors($form->get('latitude')); ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('longitude')); ?>
+                <?= $this->formElement($form->get('longitude')); ?>
+                <?= $this->formElementErrors($form->get('longitude')); ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formElement($form->get('update')); ?>
+            </div>
+            <?= $this->form()->closeTag(); ?>
+        </div>
+    </div>
+</div>
+
+
+

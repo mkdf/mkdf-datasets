@@ -394,7 +394,7 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
         //$permissions = $this->_repository->findDatasetPermissions($id);
-        $metadata = $this->_repository->findDatasetMetadata($id);
+        $metadata = $this->_repository->findDatasetGeospatial($id);
         $message = "Dataset: " . $id;
         $actions = [];
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
@@ -422,5 +422,55 @@ class DatasetController extends AbstractActionController
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
+    }
+
+    public function geospatialEditAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $user_id = $this->currentUser()->getId();
+        //$permissions = $this->_repository->findDatasetPermissions($id);
+        $metadata = $this->_repository->findDatasetGeospatial($id);
+        $spatial = [
+            'latitude' => null,
+            'longitude' => null
+        ];
+        foreach ($metadata as $row) {
+            $spatial[$row['name']] = $row['value'];
+        }
+        $message = "Dataset: " . $id;
+        $actions = [];
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        if ($can_edit) {
+            $form = new Form\GeospatialForm($this->_repository);
+            if($this->getRequest()->isPost()) {
+                $data = $this->params()->fromPost();
+                //print_r($data);
+                $form->setData($data);
+                if($form->isValid()){
+                    // Write data
+                    $output = $this->_repository->updateDatasetGeospatial($id, $data['latitude'], $data['longitude']);
+                    // Redirect to "view" page
+                    $this->flashMessenger()->addSuccessMessage('Location information updated succesfully.');
+                    return $this->redirect()->toRoute('dataset', ['action'=>'geospatialDetails', 'id'=>$id]);
+                }else{
+                    $messages[] = [ 'type'=> 'warning', 'message'=>'Please check the content of the form.'];
+                }
+            } else{
+                $form->setData($spatial);
+            }
+            // Pass form variable to view
+            return new ViewModel(
+                [
+                    'form' => $form,
+                    'messages' => $messages,
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'dataset_id' => $id
+                ]
+            );
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id'=>$id]);
+        }
     }
 }

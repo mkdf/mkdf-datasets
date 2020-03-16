@@ -96,11 +96,13 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'datasetMetadata' => 'SELECT m.name, m.description, dm.value FROM dataset__metadata dm '.
                 'JOIN metadata m ON dm.meta_id = m.id '.
                 'WHERE dataset_id = '.$this->fp('dataset_id'),
-            'datasetGeospatial' => 'SELECT m.name, m.description, dm.value FROM dataset__metadata dm '.
+            'datasetGeospatial' => 'SELECT m.id AS meta_id, dm.id AS dataset_meta_id, m.name, m.description, dm.value FROM dataset__metadata dm '.
                 'JOIN metadata m ON dm.meta_id = m.id '.
                 'WHERE dataset_id = '.$this->fp('dataset_id').
                 ' AND (m.name = "latitude" OR m.name = "longitude")',
-
+            'insertDatasetMetadataByName' => 'INSERT INTO dataset__metadata (dataset_id, meta_id, value) '.
+                'SELECT '.$this->fp('dataset_id').', id, '.$this->fp('value').' FROM metadata WHERE name = '.$this->fp('meta_name'),
+            'updateDatasetMetadata' => 'UPDATE dataset__metadata SET value='.$this->fp('value').' WHERE id = '.$this->fp('dataset_meta_id'),
         ];
     }
 
@@ -324,6 +326,49 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             }
         }
         return $metadata;
+    }
+
+    public function updateDatasetGeospatial($id, $lat, $lon) {
+        //Check if geospatial metadata already set, and update it if so. Else insert appropriate metadata
+        $metadata = $this->findDatasetGeospatial($id);
+        if (count($metadata) == 0){
+            //INSERT new metadata entries
+
+            $parameters = [
+                'meta_name' => 'latitude',
+                'dataset_id' => $id,
+                'value' => $lat,
+            ];
+            $statement = $this->_adapter->createStatement($this->getQuery('insertDatasetMetadataByName'));
+            $result    = $statement->execute($parameters);
+            $parameters = [
+                'meta_name' => 'longitude',
+                'dataset_id' => $id,
+                'value' => $lon,
+            ];
+            $statement = $this->_adapter->createStatement($this->getQuery('insertDatasetMetadataByName'));
+            $result    = $statement->execute($parameters);
+
+        }
+        else {
+            //UPDATE existing metadata entries
+            foreach ($metadata as $row) {
+                if ($row['name'] == 'latitude') {
+                    $parameters = [
+                        'dataset_meta_id' => $row['dataset_meta_id'],
+                        'value' => $lat,
+                    ];
+                }
+                else {
+                    $parameters = [
+                        'dataset_meta_id' => $row['dataset_meta_id'],
+                        'value' => $lon,
+                    ];
+                }
+                $statement = $this->_adapter->createStatement($this->getQuery('updateDatasetMetadata'));
+                $result    = $statement->execute($parameters);
+            }
+        }
     }
 
     /**

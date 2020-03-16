@@ -32,48 +32,21 @@ class GeospatialForm extends Form
      */
     protected function addElements()
     {
-        // Add "title" field
+        // Add "latitude" field
         $this->add([
             'type'  => 'text',
-            'name' => 'title',
+            'name' => 'latitude',
             'options' => [
-                'label' => 'Title',
+                'label' => 'Latitude',
             ],
         ]);
 
-        // Add "description" field
+        // Add "longitude" field
         $this->add([
-            'type'  => 'textarea',
-            'name' => 'description',
+            'type'  => 'text',
+            'name' => 'longitude',
             'options' => [
-                'label' => 'Description',
-            ],
-        ]);
-
-
-        $datasetTypes = $this->_repository->findDatasetTypes();
-        $valueOptions = [];
-        foreach ($datasetTypes as $option) {
-            $id = $option->id;
-            $label = $option->name . " - " . $option->description;
-            $valueOptions[$id] = $label;
-        }
-
-        $this->add([
-            'type' => 'radio',
-            'name' => 'datasetTypes',
-            'options' => [
-                'label' => 'Dataset type',
-                'value_options' => $valueOptions,
-            ],
-        ]);
-
-        // Add the Submit button
-        $this->add([
-            'type'  => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'value' => 'Create'
+                'label' => 'Longitude',
             ],
         ]);
 
@@ -95,46 +68,34 @@ class GeospatialForm extends Form
         // Create main input filter
         $inputFilter = $this->getInputFilter();
 
-        // Add input for "title" field
+        // Add input for "latitude" field
         $inputFilter->add([
-            'name'     => 'title',
+            'name'     => 'latitude',
             'required' => true,
             'filters'  => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
                 [
-                    'name'    => 'StringLength',
-                    'options' => [
-                        'min' => 1,
-                        'max' => 128
-                    ],
+                    'name'    => 'Float',
                 ],
             ],
         ]);
 
-        // Add input for "description" field
+        // Add input for "longitude" field
         $inputFilter->add([
-            'name'     => 'description',
+            'name'     => 'longitude',
             'required' => true,
             'filters'  => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
                 [
-                    'name'    => 'StringLength',
-                    'options' => [
-                        'min' => 1,
-                        'max' => 1024
-                    ],
+                    'name'    => 'Float',
                 ],
             ],
         ]);
 
-        $inputFilter->add([
-            'name'     => 'datasetTypes',
-            'required' => false,
-        ]);
 
     }
 }
