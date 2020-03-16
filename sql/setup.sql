@@ -81,16 +81,34 @@ CREATE TABLE `metadata` (
                             PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `dataset__metadata` (
-                                     `dataset_id` int(11) NOT NULL,
-                                     `meta_id` int(11) NOT NULL,
-                                     `value` varchar(255) NOT NULL,
-                                     PRIMARY KEY (`meta_id`,`dataset_id`),
-                                     KEY `idx_dataset__metadata_value` (`value`),
-                                     KEY `dataset__metadata_dataset_id_fk` (`dataset_id`),
-                                     CONSTRAINT `dataset__metadata_dataset_id_fk` FOREIGN KEY (`dataset_id`) REFERENCES `dataset` (`id`) ON DELETE CASCADE,
-                                     CONSTRAINT `dataset__metadata_metadata_id_fk` FOREIGN KEY (`meta_id`) REFERENCES `metadata` (`id`) ON DELETE CASCADE
+INSERT INTO datahub_beta.metadata (id, name, description) VALUES (1, 'latitude', 'X latitiude coordinate (WGS84)');
+INSERT INTO datahub_beta.metadata (id, name, description) VALUES (2, 'longitude', 'Y longitude coordiante (WGS84)');
+
+create table if not exists dataset__metadata
+(
+    id         int auto_increment
+        primary key,
+    dataset_id int          not null,
+    meta_id    int          not null,
+    value      varchar(255) not null,
+    constraint dataset__metadata__dataset_id
+        foreign key (dataset_id) references dataset (id)
+            on delete cascade,
+    constraint dataset__metadata__metadata_id
+        foreign key (meta_id) references metadata (id)
+            on delete cascade
 );
+
+create index dataset_id
+    on dataset__metadata (dataset_id);
+
+create index meta_id
+    on dataset__metadata (meta_id);
+
+create index value
+    on dataset__metadata (value);
+
+
 
 
 
