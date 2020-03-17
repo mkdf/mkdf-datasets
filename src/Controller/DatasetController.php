@@ -404,7 +404,7 @@ class DatasetController extends AbstractActionController
                 'label' => 'Actions',
                 'class' => '',
                 'buttons' => [
-                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'geospatialEdit']],
+                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'geospatial-edit']],
                 ]
             ];
         }
@@ -451,7 +451,7 @@ class DatasetController extends AbstractActionController
                     $output = $this->_repository->updateDatasetGeospatial($id, $data['latitude'], $data['longitude']);
                     // Redirect to "view" page
                     $this->flashMessenger()->addSuccessMessage('Location information updated succesfully.');
-                    return $this->redirect()->toRoute('dataset', ['action'=>'geospatialDetails', 'id'=>$id]);
+                    return $this->redirect()->toRoute('dataset', ['action'=>'geospatial-details', 'id'=>$id]);
                 }else{
                     $messages[] = [ 'type'=> 'warning', 'message'=>'Please check the content of the form.'];
                 }
