@@ -491,8 +491,10 @@ class DatasetController extends AbstractActionController
             ];
         }
         if ($can_view) {
+            $attribution = $this->_repository->getSingleMetaValue($id, 'attribution');
             return new ViewModel([
                 'dataset' => $dataset,
+                'attribution' => $attribution,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
                 'actions' => $actions
             ]);

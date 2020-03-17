@@ -96,6 +96,10 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'datasetMetadata' => 'SELECT m.name, m.description, dm.value FROM dataset__metadata dm '.
                 'JOIN metadata m ON dm.meta_id = m.id '.
                 'WHERE dataset_id = '.$this->fp('dataset_id'),
+            'singleMetaValue' => 'SELECT m.id AS meta_id, dm.id AS dataset_meta_id, m.name, m.description, dm.value FROM dataset__metadata dm '.
+                'JOIN metadata m ON dm.meta_id = m.id '.
+                'WHERE dataset_id = '.$this->fp('dataset_id').
+                ' AND m.name = '.$this->fp('key'),
             'datasetGeospatial' => 'SELECT m.id AS meta_id, dm.id AS dataset_meta_id, m.name, m.description, dm.value FROM dataset__metadata dm '.
                 'JOIN metadata m ON dm.meta_id = m.id '.
                 'WHERE dataset_id = '.$this->fp('dataset_id').
@@ -498,6 +502,24 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $outcome = $statement->execute(['id'=>$id]);
         //FIXME - Backend streams and files are not deleted. Review this decision...
         return true;
+    }
+
+    public function getSingleMetaValue($id, $key) {
+        $metadata = [];
+        $parameters = [
+            'dataset_id' => $id,
+            'key' => $key,
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('singleMetaValue'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($metadata, $row);
+            }
+        }
+        return $metadata;
     }
     
     public function init(){

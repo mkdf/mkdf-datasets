@@ -6,7 +6,34 @@
         </div>
         <div class="col-md-9">
             <h2>Ownership and licensing</h2>
-            Some info here
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+
+            <div class="card">
+                <div class="card-header">
+                    Ownership
+                </div>
+                <div class="card-body">
+                    Ownership details
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    Licensing
+                </div>
+                <div class="card-body">
+                    Licensing details
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    Attribution
+                </div>
+                <div class="card-body">
+                    <?= $attribution[0]['value'] ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>
