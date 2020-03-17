@@ -28,7 +28,7 @@ class AccountDatasetsFeature implements AccountFeatureInterface
         return true;
     }
     public function getLabel(){
-        return 'My datasets';
+        return '<i class="fas fa-database"></i> My datasets';
     }
     public function isActive(){
         return $this->active;

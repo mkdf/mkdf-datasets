@@ -26,7 +26,7 @@ class GeospatialFeature implements DatasetsFeatureInterface {
         return true;
     }
     public function getLabel(){
-        return 'Location';
+        return '<i class="fas fa-map-marker-alt"></i> Location';
     }
     public function isActive(){
         return $this->active;

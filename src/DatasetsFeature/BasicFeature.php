@@ -26,7 +26,7 @@ class BasicFeature implements DatasetsFeatureInterface {
         return true;
     }
     public function getLabel(){
-        return 'Overview';
+        return '<i class="fas fa-info-circle"></i> Overview';
     }
     public function isActive(){
         return $this->active;
