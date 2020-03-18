@@ -22,7 +22,43 @@
                     Licensing
                 </div>
                 <div class="card-body">
-                    Licensing details
+                    <?php if (count($licences) > 0): ?>
+                        <table class="table table-bordered">
+                            <?php foreach ($licences as $licence) : ?>
+                                <tr>
+                                    <td><?= $this->escapeHtml($licence['name']) ?></td>
+                                    <td><?= $this->escapeHtml($licence['description']) ?></td>
+                                    <?php
+                                        $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
+                                        print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                    ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php else: ?>
+                        <em>No licence information has been assigned to this dataset.</em>
+                    <?php endif; ?>
+
+
+
+                    <script>
+                        $(document).ready(function() {
+                            $("#inputLicence").autocomplete({
+                                //source: ["here", "are", "some", "licences"]
+                                source: <?= json_encode($licenceList) ?>
+                            });
+                        });
+                    </script>
+                    <form name="addLicenceForm" id="addLicenceForm" method="POST" action="<?=$this->url( 'dataset', ['action' => 'licenceAdd', 'id' => $dataset->id]); ?>">
+                        <div class="form-group">
+                            <label for="inputLicence">Add a new licence for this dataset</label>
+                            <input type="text" class="form-control" name="inputLicence" id="inputLicence" placeholder="Enter licence name...">
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" name="submit" class="btn btn-primary" value="Add">
+                        </div>
+                    </form>
+
                 </div>
             </div>
 

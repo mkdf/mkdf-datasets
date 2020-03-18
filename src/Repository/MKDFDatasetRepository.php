@@ -107,6 +107,9 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'insertDatasetMetadataByName' => 'INSERT INTO dataset__metadata (dataset_id, meta_id, value) '.
                 'SELECT '.$this->fp('dataset_id').', id, '.$this->fp('value').' FROM metadata WHERE name = '.$this->fp('meta_name'),
             'updateDatasetMetadata' => 'UPDATE dataset__metadata SET value='.$this->fp('value').' WHERE id = '.$this->fp('dataset_meta_id'),
+            'datasetLicences' => 'SELECT dl.id, l.name, l.description FROM licence l, dataset__licence dl WHERE '.
+                'dl.dataset_id = '.$this->fp('dataset_id').' AND dl.licence_id = l.id',
+            'allDatasetLicenceNames' => 'SELECT name FROM licence',
         ];
     }
 
@@ -520,6 +523,42 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             }
         }
         return $metadata;
+    }
+
+    public function getLicenses($id) {
+        $licenses = [];
+        $parameters = [
+            'dataset_id' => $id
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetLicences'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+        $resultSet = new ResultSet;
+        $resultSet->initialize($result);
+        foreach ($resultSet as $row) {
+            array_push($licenses, $row);
+        }
+    }
+        return $licenses;
+    }
+
+    public function deleteDatasetLicence($licenceId) {
+
+    }
+
+    public function getLicenceNames() {
+        $licenses = [];
+        $parameters = [];
+        $statement = $this->_adapter->createStatement($this->getQuery('allDatasetLicenceNames'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($licenses, $row['name']);
+            }
+        }
+        return $licenses;
     }
     
     public function init(){

@@ -492,16 +492,46 @@ class DatasetController extends AbstractActionController
         }
         if ($can_view) {
             $attribution = $this->_repository->getSingleMetaValue($id, 'attribution');
+            $licences = $this->_repository->getLicenses($id);
+            //$ownership = $this->_repository->getOwnership($id);
             return new ViewModel([
                 'dataset' => $dataset,
+                'licences' => $licences,
                 'attribution' => $attribution,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'actions' => $actions
+                'actions' => $actions,
+                'can_edit' => $can_edit,
+                'licenceList' => $this->_repository->getLicenceNames(),
             ]);
         }
         else {
             $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+        }
+    }
+
+    public function licenceDeleteAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $licenceId = $this->params()->fromQuery('licence_id', '');
+        $user_id = $this->currentUser()->getId();
+        $dataset = $this->_repository->findDataset($id);
+
+        //Check for missing params
+        if ($licenceId == '') {
+            $this->flashMessenger()->addErrorMessage('Incorrect parameters supplied.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $messages = [];
+        if($can_edit){
+            $this->_repository->deleteDatasetLicence($licenceId);
+
+            $this->flashMessenger()->addSuccessMessage('License removed.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }else{
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset licences.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
         }
     }
 }
