@@ -109,7 +109,10 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'updateDatasetMetadata' => 'UPDATE dataset__metadata SET value='.$this->fp('value').' WHERE id = '.$this->fp('dataset_meta_id'),
             'datasetLicences' => 'SELECT dl.id, l.name, l.description FROM licence l, dataset__licence dl WHERE '.
                 'dl.dataset_id = '.$this->fp('dataset_id').' AND dl.licence_id = l.id',
-            'allDatasetLicenceNames' => 'SELECT name FROM licence',
+            'datasetOwners' => 'SELECT d.id, o.name FROM owner o, dataset__owner d WHERE '.
+                'd.dataset_id = '.$this->fp('dataset_id').' AND d.owner_id = o.id',
+            'allDatasetLicences' => 'SELECT id, name, uri FROM licence',
+            'allDatasetOwnerNames' => 'SELECT name FROM owner',
         ];
     }
 
@@ -525,7 +528,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         return $metadata;
     }
 
-    public function getLicenses($id) {
+    public function getDatasetLicenses($id) {
         $licenses = [];
         $parameters = [
             'dataset_id' => $id
@@ -546,19 +549,59 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
 
     }
 
-    public function getLicenceNames() {
+    public function addDatasetLicence($id, $licenceId) {
+        //First, check if this dataset/licence combo already exists...
+
+        //If not, add it...
+
+        //Now get all licences for this dataset and update the dataset metadata field accordingly...
+    }
+
+    public function getAllLicences() {
         $licenses = [];
         $parameters = [];
-        $statement = $this->_adapter->createStatement($this->getQuery('allDatasetLicenceNames'));
+        $statement = $this->_adapter->createStatement($this->getQuery('allDatasetLicences'));
         $result    = $statement->execute($parameters);
         if ($result instanceof ResultInterface && $result->isQueryResult()) {
             $resultSet = new ResultSet;
             $resultSet->initialize($result);
             foreach ($resultSet as $row) {
-                array_push($licenses, $row['name']);
+                array_push($licenses, $row);
             }
         }
         return $licenses;
+    }
+
+    public function getDatasetOwners($id) {
+        $owners = [];
+        $parameters = [
+            'dataset_id' => $id
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetOwners'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($owners, $row);
+            }
+        }
+        return $owners;
+    }
+
+    public function getOwnerNames() {
+        $owners = [];
+        $parameters = [];
+        $statement = $this->_adapter->createStatement($this->getQuery('allDatasetOwnerNames'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($owners, $row['name']);
+            }
+        }
+        return $owners;
     }
     
     public function init(){

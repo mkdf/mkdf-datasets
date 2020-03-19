@@ -492,21 +492,41 @@ class DatasetController extends AbstractActionController
         }
         if ($can_view) {
             $attribution = $this->_repository->getSingleMetaValue($id, 'attribution');
-            $licences = $this->_repository->getLicenses($id);
+            $licences = $this->_repository->getDatasetLicenses($id);
+            $owners = $this->_repository->getDatasetOwners($id);
             //$ownership = $this->_repository->getOwnership($id);
             return new ViewModel([
                 'dataset' => $dataset,
                 'licences' => $licences,
+                'owners' => $owners,
                 'attribution' => $attribution,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
                 'actions' => $actions,
                 'can_edit' => $can_edit,
-                'licenceList' => $this->_repository->getLicenceNames(),
+                'licenceList' => $this->_repository->getAllLicences(),
+                'ownerList' => $this->_repository->getOwnerNames(),
             ]);
         }
         else {
             $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+        }
+    }
+
+    public function licenceAddAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $licenceId = $this->params()->fromQuery('licence_id', '');
+        $user_id = $this->currentUser()->getId();
+        $dataset = $this->_repository->findDataset($id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        if ($can_edit) {
+            $outcome = $this->_repository->addDatasetLicence($id, $licenceId);
+            $this->flashMessenger()->addSuccessMessage('The licence was added to the dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset licences.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
         }
     }
 

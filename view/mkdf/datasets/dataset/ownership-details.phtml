@@ -6,62 +6,108 @@
         </div>
         <div class="col-md-9">
             <h2>Ownership and licensing</h2>
-            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 
+
+<!-- OWNERSHIP -->
             <div class="card">
                 <div class="card-header">
                     Ownership
                 </div>
                 <div class="card-body">
-                    Ownership details
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    Licensing
-                </div>
-                <div class="card-body">
-                    <?php if (count($licences) > 0): ?>
-                        <table class="table table-bordered">
-                            <?php foreach ($licences as $licence) : ?>
+                    <?php if (count($owners) > 0): ?>
+                        <table class="table table-sm">
+                            <?php foreach ($owners as $owner) : ?>
                                 <tr>
-                                    <td><?= $this->escapeHtml($licence['name']) ?></td>
-                                    <td><?= $this->escapeHtml($licence['description']) ?></td>
+                                    <td><?= $this->escapeHtml($owner['name']) ?></td>
                                     <?php
-                                        $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
-                                        print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                    $url = $this->url( 'dataset', ['action' => 'ownerDelete', 'id' => $dataset->id], [query => ['owner_id' => $owner['id']]]  );
+                                    print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
                                     ?>
                                 </tr>
                             <?php endforeach; ?>
                         </table>
                     <?php else: ?>
-                        <em>No licence information has been assigned to this dataset.</em>
+                        <em>No owner information has been assigned to this dataset.</em>
                     <?php endif; ?>
 
 
 
                     <script>
                         $(document).ready(function() {
-                            $("#inputLicence").autocomplete({
+                            $("#inputOwner").autocomplete({
                                 //source: ["here", "are", "some", "licences"]
-                                source: <?= json_encode($licenceList) ?>
+                                source: <?= json_encode($ownerList) ?>
                             });
                         });
                     </script>
-                    <form name="addLicenceForm" id="addLicenceForm" method="POST" action="<?=$this->url( 'dataset', ['action' => 'licenceAdd', 'id' => $dataset->id]); ?>">
-                        <div class="form-group">
-                            <label for="inputLicence">Add a new licence for this dataset</label>
-                            <input type="text" class="form-control" name="inputLicence" id="inputLicence" placeholder="Enter licence name...">
+                    <form name="addOwnerForm" id="addOwnerForm" method="POST" action="<?=$this->url( 'dataset', ['action' => 'ownerAdd', 'id' => $dataset->id]); ?>">
+                        <label for="inputOwner">Add a new owner for this dataset</label>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+
+                                <input type="text" class="form-control" name="inputOwner" id="inputOwner" placeholder="Enter owner name...">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <input type="submit" name="submit" class="btn btn-primary" value="Add">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="submit" name="submit" class="btn btn-primary" value="Add">
+                            </div>
                         </div>
+                    </div>
                     </form>
 
                 </div>
             </div>
+<!-- END OWNERSHIP -->
 
+<!-- LICENSING -->
+
+
+            <div class="card">
+                <div class="card-header">
+                    Licensing
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Assigned licenses</h6>
+                            <?php if (count($licences) > 0): ?>
+                                <table class="table table-sm">
+                                    <?php foreach ($licences as $licence) : ?>
+                                        <tr>
+                                            <td><?= $this->escapeHtml($licence['name']) ?></td>
+                                            <?php
+                                            $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
+                                            print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                            ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </table>
+                            <?php else: ?>
+                                <em>No licence information has been assigned to this dataset.</em>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6>Available licenses</h6>
+                            <table class="table table-sm">
+                                <?php foreach ($licenceList as $licenceListItem) : ?>
+                                    <tr>
+                                        <td><?= $this->escapeHtml($licenceListItem['name']) ?></td>
+                                        <td><a class='btn btn-sm btn-primary' href='<?=$this->url( 'dataset', ['action' => 'licenceAdd', 'id' => $dataset->id],['query' => ['licence_id' => $licenceListItem['id']]]); ?>'><i class="fas fa-plus-square"></i></a></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+<!-- END LICENSING -->
+
+<!-- ATTRIBUTION -->
+            <!-- <?= $this->partial('mkdf/core/partial/actions', $actions); ?> -->
             <div class="card">
                 <div class="card-header">
                     Attribution
@@ -70,6 +116,8 @@
                     <?= $attribution[0]['value'] ?>
                 </div>
             </div>
+<!-- END ATTRIBUTION -->
+
         </div>
     </div>
 </div>
