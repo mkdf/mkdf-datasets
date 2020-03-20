@@ -116,6 +116,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'getDatasetLicence' => 'SELECT id FROM dataset__licence where dataset_id = '.$this->fp('dataset_id').
                 ' AND licence_id = '.$this->fp('licence_id'),
             'insertDatasetLicence' => 'INSERT INTO dataset__licence (dataset_id, licence_id) VALUES ('.$this->fp('dataset_id').', '.$this->fp('licence_id').')',
+            'deleteDatasetLicence' => 'DELETE FROM dataset__licence WHERE id = '.$this->fp('id'),
         ];
     }
 
@@ -548,8 +549,14 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         return $licenses;
     }
 
-    public function deleteDatasetLicence($licenceId) {
-
+    public function deleteDatasetLicence($datasetLicenceId) {
+        //$datasetLicenceId is the id of the dataset__licence relation entry, not the
+        //ID of the actual licence in teh licence table
+        $parameters = [
+            'id' => $datasetLicenceId
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('deleteDatasetLicence'));
+        $result    = $statement->execute($parameters);
     }
 
     public function addDatasetLicence($datasetId, $licenceId) {
