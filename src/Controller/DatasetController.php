@@ -521,7 +521,12 @@ class DatasetController extends AbstractActionController
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         if ($can_edit) {
             $outcome = $this->_repository->addDatasetLicence($id, $licenceId);
-            $this->flashMessenger()->addSuccessMessage('The licence was added to the dataset.');
+            if ($outcome == 1){
+                $this->flashMessenger()->addSuccessMessage('The licence was added to the dataset.');
+            }
+            else {
+                $this->flashMessenger()->addSuccessMessage('The licence is already assigned to the dataset.');
+            }
             return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
         }
         else {

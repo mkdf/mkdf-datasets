@@ -113,6 +113,9 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                 'd.dataset_id = '.$this->fp('dataset_id').' AND d.owner_id = o.id',
             'allDatasetLicences' => 'SELECT id, name, uri FROM licence',
             'allDatasetOwnerNames' => 'SELECT name FROM owner',
+            'getDatasetLicence' => 'SELECT id FROM dataset__licence where dataset_id = '.$this->fp('dataset_id').
+                ' AND licence_id = '.$this->fp('licence_id'),
+            'insertDatasetLicence' => 'INSERT INTO dataset__licence (dataset_id, licence_id) VALUES ('.$this->fp('dataset_id').', '.$this->fp('licence_id').')',
         ];
     }
 
@@ -549,12 +552,30 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
 
     }
 
-    public function addDatasetLicence($id, $licenceId) {
+    public function addDatasetLicence($datasetId, $licenceId) {
         //First, check if this dataset/licence combo already exists...
+        $parameters = [
+            'dataset_id' => $datasetId,
+            'licence_id' => $licenceId,
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('getDatasetLicence'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            if (count($result) > 0) {
+                //licence already allocated to this dataset
+                return 0;
+            }
+        }
 
         //If not, add it...
+        $statement = $this->_adapter->createStatement($this->getQuery('insertDatasetLicence'));
+        $result    = $statement->execute($parameters);
 
         //Now get all licences for this dataset and update the dataset metadata field accordingly...
+
+        return 1;
     }
 
     public function getAllLicences() {
