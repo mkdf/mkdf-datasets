@@ -111,6 +111,13 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                 'dl.dataset_id = '.$this->fp('dataset_id').' AND dl.licence_id = l.id',
             'datasetOwners' => 'SELECT d.id, o.name FROM owner o, dataset__owner d WHERE '.
                 'd.dataset_id = '.$this->fp('dataset_id').' AND d.owner_id = o.id',
+            'getDatasetOwner' => 'SELECT d.id FROM dataset__owner d, owner o WHERE d.dataset_id = '.$this->fp('dataset_id').
+                ' AND o.name = '.$this->fp('owner_name').' AND d.owner_id = o.id',
+            'insertDatasetOwner' => 'INSERT INTO dataset__owner (dataset_id, owner_id) '.
+                'SELECT '.$this->fp('dataset_id').', id FROM owner WHERE name = '.$this->fp('owner_name'),
+            'insertOwner' => 'INSERT INTO owner (name) VALUES ('.$this->fp('name').') '.
+                'ON DUPLICATE KEY UPDATE name = '.$this->fp('name'),
+            'deleteDatasetOwner' => 'DELETE FROM dataset__owner WHERE id = '.$this->fp('id'),
             'allDatasetLicences' => 'SELECT id, name, uri FROM licence',
             'allDatasetOwnerNames' => 'SELECT name FROM owner',
             'getDatasetLicence' => 'SELECT id FROM dataset__licence where dataset_id = '.$this->fp('dataset_id').
@@ -630,6 +637,47 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             }
         }
         return $owners;
+    }
+
+    public function addDatasetOwner($datasetId, $ownerName) {
+        //First, check if this dataset/owner combo already exists...
+        $parameters = [
+            'dataset_id' => $datasetId,
+            'owner_name' => $ownerName,
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('getDatasetOwner'));
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            if (count($result) > 0) {
+                //owner already allocated to this dataset
+                return 0;
+            }
+        }
+
+        //If not, add it...
+        //First add into the owner table
+        $ownerParams = [
+            'name' => $ownerName
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('insertOwner'));
+        $result    = $statement->execute($ownerParams);
+        //then add the database relation
+        $statement = $this->_adapter->createStatement($this->getQuery('insertDatasetOwner'));
+        $result    = $statement->execute($parameters);
+
+        //Now get all owners for this dataset and update the dataset metadata field accordingly...
+
+        return 1;
+    }
+
+    public function deleteDatasetOwner($id) {
+        $parameters = [
+            'id' => $id
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('deleteDatasetOwner'));
+        $result    = $statement->execute($parameters);
     }
     
     public function init(){

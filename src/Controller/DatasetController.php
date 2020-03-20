@@ -559,4 +559,63 @@ class DatasetController extends AbstractActionController
             return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
         }
     }
+
+    public function ownerAddAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        //$ownerName = $this->params()->fromQuery('inputOwner', '');
+        $user_id = $this->currentUser()->getId();
+        $dataset = $this->_repository->findDataset($id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+
+        if(!$this->getRequest()->isPost()) {
+            $this->flashMessenger()->addErrorMessage('Incorrect parameters supplied.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+        $ownerName = $this->params()->fromPost('inputOwner', '');
+        //Check for missing params
+        if ($ownerName == '') {
+            $this->flashMessenger()->addErrorMessage('Incorrect parameters supplied.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+
+        if ($can_edit) {
+            $outcome = $this->_repository->addDatasetOwner($id, $ownerName);
+            if ($outcome == 1){
+                $this->flashMessenger()->addSuccessMessage('The owner was added to the dataset.');
+            }
+            else {
+                $this->flashMessenger()->addSuccessMessage('The owner is already assigned to the dataset.');
+            }
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset owners.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+    }
+
+    public function ownerDeleteAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $datasetOwnerId = $this->params()->fromQuery('owner_id', '');
+        $user_id = $this->currentUser()->getId();
+        $dataset = $this->_repository->findDataset($id);
+
+        //Check for missing params
+        if ($datasetOwnerId == '') {
+            $this->flashMessenger()->addErrorMessage('Incorrect parameters supplied.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $messages = [];
+        if($can_edit){
+            $this->_repository->deleteDatasetOwner($datasetOwnerId);
+
+            $this->flashMessenger()->addSuccessMessage('Owner removed.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }else{
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset owners.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
+        }
+    }
 }
