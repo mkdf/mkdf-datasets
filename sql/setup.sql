@@ -108,6 +108,65 @@ create index meta_id
 create index value
     on dataset__metadata (value);
 
+-- JC 23/03/2020
+-- Dataset Owners
+create table if not exists owner
+(
+    id   int auto_increment
+        primary key,
+    name varchar(250) not null,
+    constraint owner_name_uindex
+        unique (name)
+);
+
+create table if not exists dataset__owner
+(
+    id         int auto_increment
+        primary key,
+    dataset_id int not null,
+    owner_id   int not null,
+    constraint dataset__owner_dataset_id_fk
+        foreign key (dataset_id) references dataset (id)
+            on delete cascade,
+    constraint dataset__owner_owner_id_fk
+        foreign key (owner_id) references owner (id)
+            on delete cascade
+);
+
+-- JC 23/03/2020
+-- Dataset licences
+create table if not exists licence
+(
+    id          int auto_increment
+        primary key,
+    name        varchar(250)  null,
+    description varchar(5000) null,
+    uri         varchar(250)  null,
+    constraint licence_name_uindex
+        unique (name)
+);
+
+create table if not exists dataset__licence
+(
+    id         int auto_increment
+        primary key,
+    dataset_id int not null,
+    licence_id int not null,
+    constraint dataset__licence_dataset_id_fk
+        foreign key (dataset_id) references dataset (id)
+            on delete cascade,
+    constraint dataset__licence_licence_id_fk
+        foreign key (licence_id) references licence (id)
+            on delete cascade
+);
+
+-- Some sample licences
+INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (1, 'Apache License', 'This is the description of the Apache licence', 'https://www.apache.org/licenses/LICENSE-2.0');
+INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (2, 'Creative Commons', 'Description of Creative Commons licence', 'https://creativecommons.org/licenses/by/4.0/');
+INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (3, 'Open Government Licence', null, 'http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/');
+INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (4, 'Koubachi Platform Terms of Service', null, 'https://datahub.mksmart.org/policy/koubachi-platform-terms-of-service/');
+INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (5, 'Flickr APIs Terms of Use', null, 'https://www.flickr.com/help/terms/api');
+
 
 
 
