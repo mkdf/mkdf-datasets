@@ -14,7 +14,7 @@ create table if not exists dataset
     title         varchar(255)                       not null,
     description   varchar(255)                       not null,
     type          int                                null,
-    uuid          varchar(28)                        not null,
+    uuid          varchar(64)                        not null,
     user_id       int                                not null,
     date_created  datetime default CURRENT_TIMESTAMP null,
     date_modified datetime default CURRENT_TIMESTAMP null,
