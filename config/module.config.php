@@ -98,6 +98,12 @@ return [
             [
                 'label' => 'Datasets',
                 'route' => 'dataset',
+                'pages' => [
+                    [
+                        'label' => 'Overview',
+                        'uri'   => 'dataset/details',
+                    ],
+                ]
             ],
         ],
     ],

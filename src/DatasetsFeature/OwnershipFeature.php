@@ -14,13 +14,13 @@ class OwnershipFeature implements DatasetsFeatureInterface
         return 'ownership-details';
     }
     public function getEditAction(){
-        return 'ownership-edit';
+        return 'attribution-edit';
     }
     public function getViewHref($dataset_id){
         return '/dataset/ownership-details/' . $dataset_id;
     }
     public function getEditHref($dataset_id){
-        return '/dataset/ownership-edit/' . $dataset_id;
+        return '/dataset/attribution-edit/' . $dataset_id;
     }
     public function hasFeature($dataset_id){
         // They all have this one

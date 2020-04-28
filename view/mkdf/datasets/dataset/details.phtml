@@ -1,4 +1,8 @@
-<h1><?= $dataset->title ?></h1>
+<h1><?= $dataset->title ?>
+    <?php if($myDataset): ?>
+        <i class='fas fa-user-check'></i>
+    <?php endif; ?>
+</h1>
 <div class="container">
     <div class="row">
         <div class="col-md-3">

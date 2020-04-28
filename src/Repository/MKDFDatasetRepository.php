@@ -80,6 +80,8 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'updateDataset'     => 'UPDATE dataset SET title = '.$this->fp('title').
                 ', description = '.$this->fp('description'). ', date_modified =  CURRENT_TIMESTAMP '.
                 ' WHERE id = ' .$this->fp('id'),
+            'updateDatasetAttribution' => 'UPDATE dataset SET attribution = '.$this->fp('attribution').
+                ' WHERE id = ' .$this->fp('dataset_id'),
             'deleteDataset'      => 'DELETE FROM dataset WHERE id = ' . $this->fp('id'),
             'deletePermissions' => 'DELETE FROM dataset_permission WHERE dataset_id = '. $this->fp('dataset_id'),
             'insertPermission'  => 'INSERT INTO dataset_permission (role_id, dataset_id, v, r, w, d, g) VALUES ('.
@@ -537,6 +539,30 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             }
         }
         return $metadata;
+    }
+
+    public function updateDatasetAttribution($datasetId, $attribution) {
+        //Check if attribution metadata already set, and update it if so. Else insert appropriate metadata
+        $metadata = $this->getSingleMetaValue($datasetId, 'attribution');
+        if (count($metadata) == 0){
+            //INSERT new  entry
+            $parameters = [
+                'meta_name' => 'attribution',
+                'dataset_id' => $datasetId,
+                'value' => $attribution,
+            ];
+            $statement = $this->_adapter->createStatement($this->getQuery('insertDatasetMetadataByName'));
+            $result    = $statement->execute($parameters);
+        }
+        else {
+            //UPDATE existing entry
+            $parameters = [
+                'dataset_meta_id' => $metadata[0]['dataset_meta_id'],
+                'value' => $attribution,
+            ];
+            $statement = $this->_adapter->createStatement($this->getQuery('updateDatasetMetadata'));
+            $result    = $statement->execute($parameters);
+        }
     }
 
     public function getDatasetLicenses($id) {

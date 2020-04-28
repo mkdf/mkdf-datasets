@@ -1,0 +1,30 @@
+<h1>Edit dataset attribution</h1>
+<?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <form name="attributionEditForm" id="attributionEditForm" method="POST" action="<?=$this->url( 'dataset', ['action' => 'attribution-edit', 'id' => $dataset->id]); ?>">
+                <label for="attribution">Attribution text</label>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <textarea name="attribution" class="form-control" rows="6" placeholder="Attribution text" spellcheck="false"><?= $attribution[0]->value ?></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input type="submit" name="submit" class="btn btn-primary" value="Submit">
+                            <a class="btn btn-primary" href="<?=$this->url( 'dataset', ['action' => 'ownership-details', 'id' => $dataset->id]); ?>">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+

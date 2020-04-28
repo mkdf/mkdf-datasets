@@ -8,6 +8,18 @@
             <h2>Ownership and licensing</h2>
 
 
+            <!-- ATTRIBUTION -->
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+            <div class="card">
+                <div class="card-header">
+                    Attribution
+                </div>
+                <div class="card-body">
+                    <?= $attribution[0]['value'] ?>
+                </div>
+            </div>
+            <!-- END ATTRIBUTION -->
+
 <!-- OWNERSHIP -->
             <div class="card">
                 <div class="card-header">
@@ -20,8 +32,10 @@
                                 <tr>
                                     <td><?= $this->escapeHtml($owner['name']) ?></td>
                                     <?php
-                                    $url = $this->url( 'dataset', ['action' => 'ownerDelete', 'id' => $dataset->id], [query => ['owner_id' => $owner['id']]]  );
-                                    print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                    if ($can_edit) {
+                                        $url = $this->url('dataset', ['action' => 'ownerDelete', 'id' => $dataset->id], [query => ['owner_id' => $owner['id']]]);
+                                        print ("<td><a class='btn btn-sm btn-danger' href='" . $url . "'><i class='fas fa-trash-alt'></i></a></td>");
+                                    }
                                     ?>
                                 </tr>
                             <?php endforeach; ?>
@@ -40,6 +54,7 @@
                             });
                         });
                     </script>
+                    <?php if($can_edit): ?>
                     <form name="addOwnerForm" id="addOwnerForm" method="POST" action="<?=$this->url( 'dataset', ['action' => 'ownerAdd', 'id' => $dataset->id]); ?>">
                         <label for="inputOwner">Add a new owner for this dataset</label>
                     <div class="row">
@@ -56,6 +71,7 @@
                         </div>
                     </div>
                     </form>
+                    <?php endif; ?>
 
                 </div>
             </div>
@@ -78,8 +94,10 @@
                                         <tr>
                                             <td><?= $this->escapeHtml($licence['name']) ?></td>
                                             <?php
-                                            $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
-                                            print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                            if ($can_edit) {
+                                                $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
+                                                print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                            }
                                             ?>
                                         </tr>
                                     <?php endforeach; ?>
@@ -89,34 +107,26 @@
                             <?php endif; ?>
                         </div>
 
+                        <?php if($can_edit): ?>
                         <div class="col-md-6">
                             <h6>Available licenses</h6>
                             <table class="table table-sm">
                                 <?php foreach ($licenceList as $licenceListItem) : ?>
                                     <tr>
                                         <td><?= $this->escapeHtml($licenceListItem['name']) ?></td>
+
                                         <td><a class='btn btn-sm btn-primary' href='<?=$this->url( 'dataset', ['action' => 'licenceAdd', 'id' => $dataset->id],['query' => ['licence_id' => $licenceListItem['id']]]); ?>'><i class="fas fa-plus-square"></i></a></td>
+
                                     </tr>
                                 <?php endforeach; ?>
                             </table>
                         </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>
             </div>
 <!-- END LICENSING -->
-
-<!-- ATTRIBUTION -->
-            <!-- <?= $this->partial('mkdf/core/partial/actions', $actions); ?> -->
-            <div class="card">
-                <div class="card-header">
-                    Attribution
-                </div>
-                <div class="card-body">
-                    <?= $attribution[0]['value'] ?>
-                </div>
-            </div>
-<!-- END ATTRIBUTION -->
 
         </div>
     </div>

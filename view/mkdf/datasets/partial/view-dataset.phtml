@@ -2,7 +2,11 @@
     <table class="table table-bordered">
         <tr>
             <th>Title:</th>
-            <td><?= $this->escapeHtml($dataset->title) ?></th>
+                <td><?= $this->escapeHtml($dataset->title) ?>
+                <?php if($myDataset): ?>
+                    <i class='fas fa-user-check'></i>
+                <?php endif; ?>
+            </th>
         </tr>
         <tr>
             <th>Description:</th>

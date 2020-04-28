@@ -82,6 +82,7 @@ class DatasetController extends AbstractActionController
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
+        $myDataset = ($dataset->user_id == $user_id) ? true : false;
         $permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
         $actions = [];
@@ -106,7 +107,8 @@ class DatasetController extends AbstractActionController
                 'dataset' => $dataset,
                 'permissions' => $permissions,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'actions' => $actions
+                'actions' => $actions,
+                'myDataset' => $myDataset
             ]);
         }
         else {
@@ -474,6 +476,41 @@ class DatasetController extends AbstractActionController
         }
     }
 
+    public function attributionEditAction () {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $user_id = $this->currentUser()->getId();
+        $actions = [];
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        if ($can_edit) {
+            if($this->getRequest()->isPost()) {
+                $data = $this->params()->fromPost();
+                //print_r($data);
+
+                // Write data
+                $output = $this->_repository->updateDatasetAttribution($id, $data['attribution']);
+                // Redirect to "view" page
+                $this->flashMessenger()->addSuccessMessage('Dataset attribution updated succesfully.');
+                return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id'=>$id]);
+
+            } else{
+                $attribution = $this->_repository->getSingleMetaValue($id, 'attribution');
+                return new ViewModel([
+                    'dataset' => $dataset,
+                    'attribution' => $attribution,
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'actions' => $actions,
+                    'can_edit' => $can_edit,
+                ]);
+            }
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
+        }
+    }
+
     public function ownershipDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_repository->findDataset($id);
@@ -486,7 +523,7 @@ class DatasetController extends AbstractActionController
                 'label' => 'Actions',
                 'class' => '',
                 'buttons' => [
-                    ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'ownership-edit']],
+                    ['type'=>'warning','label'=>'Edit attribution', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'attribution-edit']],
                 ]
             ];
         }
