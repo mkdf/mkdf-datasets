@@ -93,6 +93,7 @@ return [
             ],
         ]
     ],
+    /*
     'navigation' => [
         'default' => [
             [
@@ -107,4 +108,5 @@ return [
             ],
         ],
     ],
+    */
 ];
