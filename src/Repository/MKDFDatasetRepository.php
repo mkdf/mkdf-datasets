@@ -199,7 +199,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         return [];
     }
 
-    public function findDatasetLocations ($userID) {
+    public function findDatasetLocations ($userId) {
         $datasetCollection = [];
         if ($userId > 0) {
             $loginStatus = -1; //signifies logged in, in roles table
