@@ -71,6 +71,21 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                                                 ' OR '.
                                                 '(dp.role_id = '.$this->fp('user_id').' AND dp.v = 1)'.
                                             ') ORDER BY d.date_created DESC ',
+            'allVisibleDatasetLocations'=> 'SELECT d.id, d.title, dmlat.value as latitude, dmlon.value as longitude '.
+' FROM dataset__metadata dmlat, dataset__metadata dmlon, dataset d '.
+' JOIN dataset_permission dp ON d.id = dp.dataset_id '.
+' WHERE '.
+' d.id = dmlat.dataset_id AND '.
+' d.id = dmlon.dataset_id AND '.
+' dmlat.meta_id = 1 AND dmlon.meta_id = 2 AND '.
+
+                '('.
+                '(dp.role_id = '.$this->fp('login_status').' AND dp.v = 1) '.
+                ' OR '.
+                '(d.user_id = '.$this->fp('user_id').' AND dp.role_id = '.$this->fp('logged_in_identifier').')'.
+                ' OR '.
+                '(dp.role_id = '.$this->fp('user_id').' AND dp.v = 1)'.
+                ') ',
             'userDatasets'      => 'SELECT d.id, d.title, d.description, d.uuid, d.user_id, d.date_created, d.date_modified, d.type, t.name AS typelabel FROM dataset d '.
                 'LEFT JOIN dataset_type t ON d.type = t.id '.
                 ' WHERE user_id = '.$this->fp('user_id').' ORDER BY date_created DESC',
@@ -182,6 +197,33 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             return $datasetCollection;
         }
         return [];
+    }
+
+    public function findDatasetLocations ($userID) {
+        $datasetCollection = [];
+        if ($userId > 0) {
+            $loginStatus = -1; //signifies logged in, in roles table
+        }
+        else {
+            $loginStatus = -2; //as per roles in roles table
+            $userId = -2; //if not logged in, use -2 (anonymous) to query against the role permissions
+        }
+        $parameters = [
+            'login_status'  => $loginStatus,
+            'user_id'       => $userId,
+            'logged_in_identifier' => -1
+        ];
+        $query = $this->getQuery('allVisibleDatasetLocations');
+        $statement = $this->_adapter->createStatement($query);
+        $result    = $statement->execute($parameters);
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $resultSet = new ResultSet;
+            $resultSet->initialize($result);
+            foreach ($resultSet as $row) {
+                array_push($datasetCollection, $row);
+            }
+        }
+        return $datasetCollection;
     }
 
     public function findUserDatasets($userId = 0) {

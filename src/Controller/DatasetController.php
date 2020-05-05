@@ -16,6 +16,7 @@ use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
 use MKDF\Datasets\Service\Factory\DatasetPermissionManagerFactory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\View\Model\JsonModel;
 use Zend\Session\Container;
 use Zend\Paginator\Adapter;
 use Zend\Paginator\Paginator;
@@ -76,6 +77,45 @@ class DatasetController extends AbstractActionController
             'url_params' => $this->params()->fromQuery(),
             'txt_search' => $txtSearch,
         ]);
+    }
+
+    public function locationsAction () {
+        $user = $this->currentUser();
+        $userId = $user->getId();
+        $datasetCollection = $this->_repository->findDatasetLocations($userId);
+        $geojson = [
+            'type' => 'FeatureCollection',
+            'name' => 'Datafeeds',
+            'crs' => [
+                'type' => 'name',
+                'properties' => [
+                    'name' => 'urn:ogc:def:crs:OGC:1.3:CRS84'
+                ],
+            ],
+            'features' => []
+        ];
+
+        foreach ($datasetCollection as $item) {
+            $feature = [
+                'type' => 'Feature',
+                'properties' => [
+                    'title' => $item['title'],
+                    'uuid' => 'test',
+                    'url' => 'http://bbc.co.uk',
+                    'name' => 'test',
+                    'marker-color' => '#f00',
+                    'marker-size' => 'small',
+                    'visible' => 1
+                ],
+                'geometry' => [
+                    'type' => 'Point',
+                    'coordinates' => [(float)$item['longitude'],(float)$item['latitude']]
+                ],
+            ];
+
+            array_push( $geojson['features'],$feature);
+        }
+        return new JsonModel($geojson);
     }
 
     public function detailsAction() {

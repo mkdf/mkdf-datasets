@@ -61,6 +61,9 @@ return [
         'template_path_stack' => [
             'Dataset' => __DIR__ . '/../view',
         ],
+        'strategies' => [
+            'ViewJsonStrategy'
+            ]
     ],
     'controller_plugins' => [
         'factories' => [
