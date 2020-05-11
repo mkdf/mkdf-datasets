@@ -96,13 +96,14 @@ class DatasetController extends AbstractActionController
         ];
 
         foreach ($datasetCollection as $item) {
+            $url = $this->url()->fromRoute('dataset',['action'=>'details', 'id'=>$item['id']]);
             $feature = [
                 'type' => 'Feature',
                 'properties' => [
                     'title' => $item['title'],
-                    'uuid' => 'test',
-                    'url' => 'http://bbc.co.uk',
-                    'name' => 'test',
+                    'uuid' => $item['uuid'],
+                    'url' => $url,
+                    'name' => $item['title'],
                     'marker-color' => '#f00',
                     'marker-size' => 'small',
                     'visible' => 1
@@ -427,6 +428,7 @@ class DatasetController extends AbstractActionController
             'user' => $user,
             'userid' => $userId,
             'actions' => $actions,
+            'url_params' => $this->params()->fromQuery(),
             'features' => $this->accountFeatureManager()->getFeatures($userId),
         ]);
     }
