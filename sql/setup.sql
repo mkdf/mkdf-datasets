@@ -77,7 +77,7 @@ INSERT INTO dataset_type (id, name, description) VALUES (2, 'file', 'Datasets co
 CREATE TABLE `metadata` (
                             `id` int(11) NOT NULL AUTO_INCREMENT,
                             `name` varchar(50) NOT NULL,
-                            `description` varchar(255) DEFAULT NULL,
+                            `description` text DEFAULT NULL,
                             PRIMARY KEY (`id`)
 );
 
@@ -140,7 +140,7 @@ create table if not exists licence
     id          int auto_increment
         primary key,
     name        varchar(250)  null,
-    description varchar(5000) null,
+    description text null,
     uri         varchar(250)  null,
     constraint licence_name_uindex
         unique (name)
