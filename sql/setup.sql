@@ -90,7 +90,7 @@ create table if not exists dataset__metadata
         primary key,
     dataset_id int          not null,
     meta_id    int          not null,
-    value      varchar(255) not null,
+    value      varchar(1024) not null,
     constraint dataset__metadata__dataset_id
         foreign key (dataset_id) references dataset (id)
             on delete cascade,
