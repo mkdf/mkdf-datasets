@@ -24,7 +24,8 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'username' => $this->_config['db']['user'],
             'password' => $this->_config['db']['password'],
             'host'     => $this->_config['db']['host'],
-            'port'     => $this->_config['db']['port']
+            'port'     => $this->_config['db']['port'],
+            'charset'  => $this->_config['db']['charset'],
         ]);
         $this->buildQueries();
     }
