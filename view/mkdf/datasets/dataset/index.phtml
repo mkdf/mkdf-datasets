@@ -33,12 +33,12 @@
 
 <table class="table table-bordered">
     <tr class="table-active">
-        <th>ID</th>
+        <!--<th>ID</th>-->
         <th>Title</th>
         <th>Description</th>
         <!--<th>UUID</th>-->
         <th>Type</th>
-        <th></th>
+        <!--<th></th>-->
 
     </tr>
     <?php foreach ($datasets as $dataset) : ?>
@@ -47,20 +47,29 @@
             $tr = ($myDataset) ? "<tr class='table-primary'>" : "<tr>";
         ?>
         <?= $tr ?>
+            <!--
             <td>
                 <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
                     <?= $this->escapeHtml($dataset['id']) ?>
                 </a>
             </td>
+            -->
             <td>
                 <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
                     <?= $this->escapeHtml($dataset['title']) ?>
                 </a>
+                    <?php
+                    if ($myDataset) {
+                        print ("<i class='fas fa-user-check float-right' data-toggle='tooltip' data-placement='top' title='My dataset'></i>");
+                    }
+                    ?>
+
             </td>
             <!--<td><?= $this->escapeHtml($dataset['description']) ?></td>-->
             <td><?= strip_tags($dataset['description']) ?></td>
             <!--<td><?= $this->escapeHtml($dataset['uuid']) ?></td>-->
             <td><?= $this->escapeHtml($dataset['typelabel']) ?></td>
+            <!--
             <td>
                 <?php
                     if ($myDataset) {
@@ -68,6 +77,7 @@
                     }
                 ?>
             </td>
+            -->
         </tr>
     <?php endforeach; ?>
 
