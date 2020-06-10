@@ -62,9 +62,11 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                                             'dataset d '.
                                         'JOIN dataset_permission dp ON d.id = dp.dataset_id '.
                                         'LEFT JOIN dataset_type t ON d.type = t.id '.
+                                        'LEFT JOIN dataset__metadata dm ON d.id = dm.dataset_id '.
                                         'WHERE '.
 
-                                            '(d.title LIKE '.$this->fp('search_title').' OR d.description LIKE '.$this->fp('search_desc').') AND '.
+                                            '(d.title LIKE '.$this->fp('search_title').' OR d.description LIKE '.$this->fp('search_desc').' OR dm.value LIKE '.$this->fp('search_meta').') AND '.
+                                            ' dm.meta_id = 4 AND '.
                                             '('.
                                                 '(dp.role_id = '.$this->fp('login_status').' AND dp.v = 1) '.
                                                 ' OR '.
@@ -169,7 +171,8 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                 'user_id'       => $userId,
                 'logged_in_identifier' => -1,
                 'search_title' => '%'.$txtSearch.'%',
-                'search_desc' => '%'.$txtSearch.'%'
+                'search_desc' => '%'.$txtSearch.'%',
+                'search_meta' => '%'.$txtSearch.'%'
             ];
             $query = $this->getQuery('allVisibleDatasetsFilter');
         }

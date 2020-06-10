@@ -92,13 +92,17 @@
                                 <table class="table table-sm">
                                     <?php foreach ($licences as $licence) : ?>
                                         <tr>
-                                            <td><?= $this->escapeHtml($licence['name']) ?></td>
+                                            <td><?= $this->escapeHtml($licence['name']) ?>
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <a class='btn btn-sm btn-info' href=''><i class='fas fa-question'  data-toggle='tooltip' data-placement='top' title='View licence'></i></a>
                                             <?php
                                             if ($can_edit) {
                                                 $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
-                                                print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");
+                                                print ("<a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a>");
                                             }
                                             ?>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </table>
