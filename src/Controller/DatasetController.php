@@ -697,4 +697,13 @@ class DatasetController extends AbstractActionController
             return $this->redirect()->toRoute('dataset', ['action'=>'ownership-details', 'id' => $id]);
         }
     }
+
+    public function licenceAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $licence = $this->_repository->getLicence($id);
+        return new ViewModel([
+            'licenceId' => $id,
+            'licence'   => $licence
+        ]);
+    }
 }

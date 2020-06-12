@@ -95,7 +95,7 @@
                                             <td><?= $this->escapeHtml($licence['name']) ?>
                                             </td>
                                             <td class="text-nowrap">
-                                                <a class='btn btn-sm btn-info' href=''><i class='fas fa-question'  data-toggle='tooltip' data-placement='top' title='View licence'></i></a>
+                                                <a class='btn btn-sm btn-info' href='<?= $this->url( 'dataset', ['action' => 'licence', 'id' => $licence['licence_id']] ) ?>'><i class='fas fa-question'  data-toggle='tooltip' data-placement='top' title='View licence'></i></a>
                                             <?php
                                             if ($can_edit) {
                                                 $url = $this->url( 'dataset', ['action' => 'licenceDelete', 'id' => $dataset->id], [query => ['licence_id' => $licence['id']]]  );
@@ -119,7 +119,10 @@
                                     <tr>
                                         <td><?= $this->escapeHtml($licenceListItem['name']) ?></td>
 
-                                        <td><a class='btn btn-sm btn-primary' href='<?=$this->url( 'dataset', ['action' => 'licenceAdd', 'id' => $dataset->id],['query' => ['licence_id' => $licenceListItem['id']]]); ?>'><i class="fas fa-plus-square"></i></a></td>
+                                        <td class="text-nowrap">
+                                            <a class='btn btn-sm btn-info' href='<?= $this->url( 'dataset', ['action' => 'licence', 'id' => $licenceListItem['id']] ) ?>'><i class='fas fa-question'  data-toggle='tooltip' data-placement='top' title='View licence'></i></a>
+                                            <a class='btn btn-sm btn-primary' href='<?=$this->url( 'dataset', ['action' => 'licenceAdd', 'id' => $dataset->id],['query' => ['licence_id' => $licenceListItem['id']]]); ?>'><i class="fas fa-plus-square"></i></a>
+                                        </td>
 
                                     </tr>
                                 <?php endforeach; ?>

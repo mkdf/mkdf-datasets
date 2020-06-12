@@ -127,7 +127,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'insertDatasetMetadataByName' => 'INSERT INTO dataset__metadata (dataset_id, meta_id, value) '.
                 'SELECT '.$this->fp('dataset_id').', id, '.$this->fp('value').' FROM metadata WHERE name = '.$this->fp('meta_name'),
             'updateDatasetMetadata' => 'UPDATE dataset__metadata SET value='.$this->fp('value').' WHERE id = '.$this->fp('dataset_meta_id'),
-            'datasetLicences' => 'SELECT dl.id, l.name, l.description FROM licence l, dataset__licence dl WHERE '.
+            'datasetLicences' => 'SELECT dl.id, l.name, l.description, l.id AS licence_id FROM licence l, dataset__licence dl WHERE '.
                 'dl.dataset_id = '.$this->fp('dataset_id').' AND dl.licence_id = l.id',
             'datasetOwners' => 'SELECT d.id, o.name FROM owner o, dataset__owner d WHERE '.
                 'd.dataset_id = '.$this->fp('dataset_id').' AND d.owner_id = o.id',
@@ -139,6 +139,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                 'ON DUPLICATE KEY UPDATE name = '.$this->fp('name'),
             'deleteDatasetOwner' => 'DELETE FROM dataset__owner WHERE id = '.$this->fp('id'),
             'allDatasetLicences' => 'SELECT id, name, uri FROM licence',
+            'getLicence'        => 'SELECT name, description, uri FROM licence WHERE id = '.$this->fp('id'),
             'allDatasetOwnerNames' => 'SELECT name FROM owner',
             'getDatasetLicence' => 'SELECT id FROM dataset__licence where dataset_id = '.$this->fp('dataset_id').
                 ' AND licence_id = '.$this->fp('licence_id'),
@@ -750,6 +751,19 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         ];
         $statement = $this->_adapter->createStatement($this->getQuery('deleteDatasetOwner'));
         $result    = $statement->execute($parameters);
+    }
+
+    public function getLicence($licenceId) {
+        $parameters = [
+            'id'   => $licenceId
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('getLicence'));
+        $result    = $statement->execute($parameters);
+        $licence = [];
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $licence = $result->current();
+        }
+        return $licence;
     }
     
     public function init(){
