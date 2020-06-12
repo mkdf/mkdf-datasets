@@ -90,7 +90,8 @@ return [
         'controllers' => [
             Controller\DatasetController::class => [
                 ['actions' => ['index'], 'allow' => '*'],
-                ['actions' => ['details'], 'allow' => '@'],
+                ['actions' => ['details'], 'allow' => '*'],
+                ['actions' => ['locations'], 'allow' => '*'],
                 ['actions' => ['mydatasets'], 'allow' => '@'],
                 ['actions' => ['add','edit','delete','delete-confirm'], 'allow' => '@']
             ],
