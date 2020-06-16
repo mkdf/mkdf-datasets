@@ -35,10 +35,18 @@
     endif;
     ?>
 
+    <?= $this->paginationControl($datasets,
+        'Sliding',
+        'application/partial/paginator',
+        [
+            'route' => 'dataset',
+            'url_params' => $url_params
+        ]); ?>
+<div class="table-responsive-md">
 <table class="table table-bordered">
     <tr class="table-active">
         <!--<th>ID</th>-->
-        <th>Title</th>
+        <th style="min-width:20em">Title</th>
         <th>Description</th>
         <!--<th>UUID</th>-->
         <!--<th>Type</th>-->
@@ -83,6 +91,7 @@
     <?php endforeach; ?>
 
 </table>
+</div>
 <?= $this->paginationControl($datasets,
         'Sliding',
         'application/partial/paginator',

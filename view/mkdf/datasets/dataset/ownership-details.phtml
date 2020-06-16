@@ -27,7 +27,7 @@
                 </div>
                 <div class="card-body">
                     <?php if (count($owners) > 0): ?>
-                        <table class="table table-sm">
+                        <table class="table table-sm table-no-top-border">
                             <?php foreach ($owners as $owner) : ?>
                                 <tr>
                                     <td><?= $this->escapeHtml($owner['name']) ?></td>
@@ -89,7 +89,7 @@
                         <div class="col-md-6">
                             <h6>Assigned licenses</h6>
                             <?php if (count($licences) > 0): ?>
-                                <table class="table table-sm">
+                                <table class="table table-sm table-no-top-border">
                                     <?php foreach ($licences as $licence) : ?>
                                         <tr>
                                             <td><?= $this->escapeHtml($licence['name']) ?>
@@ -114,7 +114,7 @@
                         <?php if($can_edit): ?>
                         <div class="col-md-6">
                             <h6>Available licenses</h6>
-                            <table class="table table-sm">
+                            <table class="table table-sm table-no-top-border">
                                 <?php foreach ($licenceList as $licenceListItem) : ?>
                                     <tr>
                                         <td><?= $this->escapeHtml($licenceListItem['name']) ?></td>
