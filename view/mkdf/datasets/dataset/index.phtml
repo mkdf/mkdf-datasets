@@ -41,7 +41,7 @@
         <th>Title</th>
         <th>Description</th>
         <!--<th>UUID</th>-->
-        <th>Type</th>
+        <!--<th>Type</th>-->
         <!--<th></th>-->
 
     </tr>
@@ -51,37 +51,34 @@
             $tr = ($myDataset) ? "<tr class='table-primary'>" : "<tr>";
         ?>
         <?= $tr ?>
-            <!--
             <td>
+                <?php
+                if ($dataset['typelabel'] == "Stream") {
+                    print ("<i class='fas fa-satellite-dish' data-toggle='tooltip' data-placement='top' title='Stream dataset'></i>");
+
+                }
+                else {
+                    print ("<i class='fas fa-folder-open' data-toggle='tooltip' data-placement='top' title='File dataset'></i>");
+                }
+                ?>
                 <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
-                    <?= $this->escapeHtml($dataset['id']) ?>
-                </a>
-            </td>
-            -->
-            <td>
-                <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
+
                     <?= $this->escapeHtml($dataset['title']) ?>
                 </a>
                     <?php
+
                     if ($myDataset) {
                         print ("<i class='fas fa-user-check float-right' data-toggle='tooltip' data-placement='top' title='My dataset'></i>");
                     }
+
                     ?>
 
             </td>
             <!--<td><?= $this->escapeHtml($dataset['description']) ?></td>-->
             <td><?= strip_tags($dataset['description']) ?></td>
-            <!--<td><?= $this->escapeHtml($dataset['uuid']) ?></td>-->
-            <td><?= $this->escapeHtml($dataset['typelabel']) ?></td>
-            <!--
-            <td>
-                <?php
-                    if ($myDataset) {
-                        print ("<i class='fas fa-user-check'></i>");
-                    }
-                ?>
-            </td>
-            -->
+            <!-- <td><?= $this->escapeHtml($dataset['uuid']) ?></td> -->
+            <!-- <td><?= $this->escapeHtml($dataset['typelabel']) ?></td> -->
+
         </tr>
     <?php endforeach; ?>
 
