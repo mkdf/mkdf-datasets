@@ -92,7 +92,10 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'userDatasets'      => 'SELECT d.id, d.title, d.description, d.uuid, d.user_id, d.date_created, d.date_modified, d.type, t.name AS typelabel FROM dataset d '.
                 'LEFT JOIN dataset_type t ON d.type = t.id '.
                 ' WHERE user_id = '.$this->fp('user_id').' ORDER BY date_created DESC',
-            'oneDataset'        => 'SELECT id, title, description, uuid, user_id, type FROM dataset WHERE id = ' . $this->fp('id'),
+            'oneDataset'        => 'SELECT d.id, d.title, d.description, d.uuid, d.user_id, t.name AS type '.
+                ' FROM dataset d '.
+                'LEFT JOIN dataset_type t ON d.type = t.id '.
+                ' WHERE d.id = ' . $this->fp('id'),
             'datasetCount'      => 'SELECT COUNT(id) AS count FROM dataset',
             'insertDataset'     => 'INSERT INTO dataset (title, description, uuid, user_id, type) VALUES ('.$this->fp('title').', '.$this->fp('description').', '.$this->fp('uuid').', '.$this->fp('user_id').', '.$this->fp('type').')',
             'updateDataset'     => 'UPDATE dataset SET title = '.$this->fp('title').

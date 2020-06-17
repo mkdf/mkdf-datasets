@@ -61,7 +61,7 @@
         <?= $tr ?>
             <td>
                 <?php
-                if ($dataset['typelabel'] == "stream") {
+                if (strtolower($dataset['typelabel'])== "stream") {
                     print ("<i class='fas fa-satellite-dish' data-toggle='tooltip' data-placement='top' title='Stream dataset'></i>");
 
                 }
