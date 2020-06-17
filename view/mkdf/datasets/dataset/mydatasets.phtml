@@ -11,7 +11,7 @@
 
                     <th>Title</th>
                     <th>Description</th>
-                    <th>Type</th>
+                    <!--<th>Type</th>-->
 
 
                 </tr>
@@ -19,12 +19,21 @@
                     <tr>
 
                         <td>
+                            <?php
+                            if (strtolower($dataset['typelabel'])== "stream") {
+                                print ("<i class='fas fa-satellite-dish' data-toggle='tooltip' data-placement='top' title='Stream dataset'></i>");
+
+                            }
+                            else {
+                                print ("<i class='fas fa-folder-open' data-toggle='tooltip' data-placement='top' title='File dataset'></i>");
+                            }
+                            ?>
                             <a href="<?= $this->url('dataset', ['action' => 'details', 'id' => $dataset['id']]) ?>">
                                 <?= $this->escapeHtml($dataset['title']) ?>
                             </a>
                         </td>
                         <td><?= $this->escapeHtml($dataset['description']) ?></td>
-                        <td><?= $this->escapeHtml($dataset['typelabel']) ?></td>
+                        <!--<td><?= $this->escapeHtml($dataset['typelabel']) ?></td>-->
                     </tr>
                 <?php endforeach; ?>
 
