@@ -36,6 +36,7 @@ class GeospatialForm extends Form
         $this->add([
             'type'  => 'text',
             'name' => 'latitude',
+            'id'    => 'latitude',
             'options' => [
                 'label' => 'Latitude',
             ],

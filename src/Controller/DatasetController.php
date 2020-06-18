@@ -491,8 +491,12 @@ class DatasetController extends AbstractActionController
 
                 array_push($geojson['features'], $feature);
 
-
-                return new JsonModel($geojson);
+                if ($lat == 0 && $lon == 0){
+                    return new JsonModel([]);
+                }
+                else {
+                    return new JsonModel($geojson);
+                }
             }
             else {
                 return new ViewModel([
