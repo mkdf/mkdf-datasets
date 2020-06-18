@@ -435,10 +435,21 @@ class DatasetController extends AbstractActionController
 
     public function geospatialDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
+        $format = $this->params()->fromQuery('f', "");
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
         //$permissions = $this->_repository->findDatasetPermissions($id);
         $metadata = $this->_repository->findDatasetGeospatial($id);
+        $lat = 0;
+        $lon = 0;
+        foreach ($metadata as $metaItem) {
+            if ($metaItem['name'] == 'latitude') {
+                $lat = $metaItem['value'];
+            }
+            if ($metaItem['name'] == 'longitude') {
+                $lon = $metaItem['value'];
+            }
+        }
         $message = "Dataset: " . $id;
         $actions = [];
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
@@ -453,13 +464,45 @@ class DatasetController extends AbstractActionController
             ];
         }
         if ($can_view) {
-            return new ViewModel([
-                'message' => $message,
-                'dataset' => $dataset,
-                'metadata' => $metadata,
-                'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'actions' => $actions
-            ]);
+            if ($format == "json"){
+                $geojson = [
+                    'type' => 'FeatureCollection',
+                    'name' => 'Datafeeds',
+                    'crs' => [
+                        'type' => 'name',
+                        'properties' => [
+                            'name' => 'urn:ogc:def:crs:OGC:1.3:CRS84'
+                        ],
+                    ],
+                    'features' => []
+                ];
+                $feature = [
+                    'type' => 'Feature',
+                    'properties' => [
+                        'title' => $dataset->title,
+                        'uuid' => $dataset->uuid,
+                        'name' => $dataset->title
+                    ],
+                    'geometry' => [
+                        'type' => 'Point',
+                        'coordinates' => [(float)$lon, (float)$lat]
+                    ],
+                ];
+
+                array_push($geojson['features'], $feature);
+
+
+                return new JsonModel($geojson);
+            }
+            else {
+                return new ViewModel([
+                    'message' => $message,
+                    'dataset' => $dataset,
+                    'metadata' => $metadata,
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'actions' => $actions
+                ]);
+            }
         }
         else {
             $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
@@ -700,7 +743,7 @@ class DatasetController extends AbstractActionController
 
     public function licenceAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
-        $licence = $this->_repository->getLicence($id);
+        $licence = $this->_repository->getLicencegetLicence($id);
         return new ViewModel([
             'licenceId' => $id,
             'licence'   => $licence

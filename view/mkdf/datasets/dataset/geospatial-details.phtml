@@ -35,5 +35,7 @@
     </div>
 
 </div>
-<?= $this->inlineScript() ?>
-<?= $this->inlineScript()->prependFile($this->basePath('js/homepage-map.js')); ?>
+<script language="JavaScript">
+    var datasetID = <?= $dataset->id; ?>;
+</script>
+<?= $this->inlineScript()->appendFile($this->basePath('js/dataset-map.js')); ?>
