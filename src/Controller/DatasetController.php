@@ -391,7 +391,7 @@ class DatasetController extends AbstractActionController
             $token = uniqid(true);
             $container = new Container('Dataset_Management');
             $container->delete_token = $token;
-            $messages[] = [ 'type'=> 'warning', 'message' =>
+            $messages[] = [ 'type'=> 'danger', 'message' =>
                 'Are you sure you want to delete this dataset?'];
             return new ViewModel(['dataset' => $dataset, 'token' => $token, 'messages' => $messages]);
         }else{
