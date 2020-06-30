@@ -91,7 +91,8 @@ return [
             Controller\DatasetController::class => [
                 ['actions' => ['index'], 'allow' => '*'],
                 ['actions' => ['details'], 'allow' => '*'],
-                ['actions' => ['locations'], 'allow' => '*'],
+                ['actions' => ['geospatial-details'], 'allow' => '*'],
+                ['actions' => ['ownership-details'], 'allow' => '*'],
                 ['actions' => ['mydatasets'], 'allow' => '@'],
                 ['actions' => ['add','edit','delete','delete-confirm'], 'allow' => '@']
             ],
