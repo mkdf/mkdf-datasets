@@ -89,29 +89,10 @@ return [
         ],
         'controllers' => [
             Controller\DatasetController::class => [
-                ['actions' => ['index'], 'allow' => '*'],
-                ['actions' => ['details'], 'allow' => '*'],
-                ['actions' => ['geospatial-details'], 'allow' => '*'],
-                ['actions' => ['ownership-details'], 'allow' => '*'],
+                ['actions' => ['index', 'details', 'geospatial-details', 'ownership-details'], 'allow' => '*'],
                 ['actions' => ['mydatasets'], 'allow' => '@'],
                 ['actions' => ['add','edit','delete','delete-confirm'], 'allow' => '@']
             ],
         ]
     ],
-    /*
-    'navigation' => [
-        'default' => [
-            [
-                'label' => 'Datasets',
-                'route' => 'dataset',
-                'pages' => [
-                    [
-                        'label' => 'Overview',
-                        'uri'   => 'dataset/details',
-                    ],
-                ]
-            ],
-        ],
-    ],
-    */
 ];
