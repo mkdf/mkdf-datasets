@@ -11,15 +11,15 @@ create table if not exists dataset
 (
     id            int auto_increment
         primary key,
-    title         varchar(255)                       not null,
-    description   varchar(255)                       not null,
+    title         varchar(255) charset utf8          not null,
+    description   text                               not null,
     type          int                                null,
-    uuid          varchar(64)                        not null,
+    uuid          varchar(64) charset utf8           not null,
     user_id       int                                not null,
     date_created  datetime default CURRENT_TIMESTAMP null,
     date_modified datetime default CURRENT_TIMESTAMP null,
-    constraint dataset_uuid_unique
-       unique uuid (uuid),
+    constraint uuid
+        unique (uuid),
     constraint dataset_dataset_type_id_fk
         foreign key (type) references dataset_type (id),
     constraint datasets___user_id
@@ -48,7 +48,14 @@ create table if not exists dataset_permission
     constraint dataset_permission___role_id
         foreign key (role_id) references role (id)
             on delete cascade
-);
+)
+    collate = utf8mb4_unicode_ci;
+
+create index dataset_permission_role_id_dataset_id_index
+    on dataset_permission (role_id, dataset_id);
+
+create index dataset_permission_role_id_index
+    on dataset_permission (role_id);
 
 -- also use the following to populate for existing datasets:
 -- v & r permission for logged in users
@@ -72,32 +79,39 @@ INSERT INTO dataset_type (id, name, description) VALUES (1, 'stream', 'Datasets 
 INSERT INTO dataset_type (id, name, description) VALUES (2, 'file', 'Datasets consisting of static files');
 
 
+create table if not exists metadata
+(
+    id          int auto_increment
+        primary key,
+    name        varchar(50) charset utf8 not null,
+    description text charset utf8        null
+)
+    collate = utf8mb4_unicode_ci;
+
+
+INSERT INTO metadata (id, name, description) VALUES (1, 'latitude', 'X latitiude coordinate (WGS84)');
+INSERT INTO metadata (id, name, description) VALUES (2, 'longitude', 'Y longitude coordiante (WGS84)');
+INSERT INTO metadata (id, name, description) VALUES (3, 'attribution', 'Dataset attribution');
+INSERT INTO metadata (id, name, description) VALUES (4, 'tags', 'Dataset tags');
+
+
 -- ******** 21/01/2020
 -- Add dataset metadata
-CREATE TABLE `metadata` (
-                            `id` int(11) NOT NULL AUTO_INCREMENT,
-                            `name` varchar(50) NOT NULL,
-                            `description` text DEFAULT NULL,
-                            PRIMARY KEY (`id`)
-);
-
-INSERT INTO datahub_beta.metadata (id, name, description) VALUES (1, 'latitude', 'X latitiude coordinate (WGS84)');
-INSERT INTO datahub_beta.metadata (id, name, description) VALUES (2, 'longitude', 'Y longitude coordiante (WGS84)');
-
 create table if not exists dataset__metadata
 (
     id         int auto_increment
         primary key,
-    dataset_id int          not null,
-    meta_id    int          not null,
-    value      varchar(1024) not null,
+    dataset_id int                       not null,
+    meta_id    int                       not null,
+    value      varchar(255) charset utf8 not null,
     constraint dataset__metadata__dataset_id
         foreign key (dataset_id) references dataset (id)
             on delete cascade,
     constraint dataset__metadata__metadata_id
         foreign key (meta_id) references metadata (id)
             on delete cascade
-);
+)
+    collate = utf8mb4_unicode_ci;
 
 create index dataset_id
     on dataset__metadata (dataset_id);
@@ -107,6 +121,8 @@ create index meta_id
 
 create index value
     on dataset__metadata (value);
+
+
 
 -- JC 23/03/2020
 -- Dataset Owners
@@ -161,11 +177,11 @@ create table if not exists dataset__licence
 );
 
 -- Some sample licences
-INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (1, 'Apache License', 'This is the description of the Apache licence', 'https://www.apache.org/licenses/LICENSE-2.0');
-INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (2, 'Creative Commons', 'Description of Creative Commons licence', 'https://creativecommons.org/licenses/by/4.0/');
-INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (3, 'Open Government Licence', null, 'http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/');
-INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (4, 'Koubachi Platform Terms of Service', null, 'https://datahub.mksmart.org/policy/koubachi-platform-terms-of-service/');
-INSERT INTO datahub_beta.licence (id, name, description, uri) VALUES (5, 'Flickr APIs Terms of Use', null, 'https://www.flickr.com/help/terms/api');
+INSERT INTO licence (id, name, description, uri) VALUES (1, 'Apache License', 'This is the description of the Apache licence', 'https://www.apache.org/licenses/LICENSE-2.0');
+INSERT INTO licence (id, name, description, uri) VALUES (2, 'Creative Commons', 'Description of Creative Commons licence', 'https://creativecommons.org/licenses/by/4.0/');
+INSERT INTO licence (id, name, description, uri) VALUES (3, 'Open Government Licence', null, 'http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/');
+INSERT INTO licence (id, name, description, uri) VALUES (4, 'Koubachi Platform Terms of Service', null, 'https://datahub.mksmart.org/policy/koubachi-platform-terms-of-service/');
+INSERT INTO licence (id, name, description, uri) VALUES (5, 'Flickr APIs Terms of Use', null, 'https://www.flickr.com/help/terms/api');
 
 
 
