@@ -747,7 +747,7 @@ class DatasetController extends AbstractActionController
 
     public function licenceAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
-        $licence = $this->_repository->getLicencegetLicence($id);
+        $licence = $this->_repository->getLicence($id);
         return new ViewModel([
             'licenceId' => $id,
             'licence'   => $licence
