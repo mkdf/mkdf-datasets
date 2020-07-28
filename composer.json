@@ -1,4 +1,4 @@
->={
+{
     "name": "mkdf/mkdf-datasets",
     "description": "MKDF Data Catalogue",
     "type": "library",
