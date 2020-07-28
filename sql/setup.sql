@@ -74,7 +74,7 @@ SELECT 0, id, 1, 1, 1, 1, 1
 FROM dataset;
 
 
-
+-- TODO Move these to related modules 'file' and 'stream'
 INSERT INTO dataset_type (id, name, description) VALUES (1, 'stream', 'Datasets that support live streaming of JSON data from sensors or other Internet conencted devices');
 INSERT INTO dataset_type (id, name, description) VALUES (2, 'file', 'Datasets consisting of static files');
 
