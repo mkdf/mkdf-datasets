@@ -9,6 +9,11 @@
         "zendframework/zend-mvc-form": "^1.0",
         "mkdf/mkdf-core": "master"
     },
+    "autoload": {
+        "psr-4": {
+            "MKDF\\Datasets\\": "src/"
+        }
+    },
     "license": "Apache-2.0",
     "authors": [
         {
