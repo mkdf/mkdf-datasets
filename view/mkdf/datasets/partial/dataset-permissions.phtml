@@ -6,7 +6,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
         'permission' => $permission,
         'role'  => $role_id
     ];
-    $link = $context->url( 'dataset', ['action' => 'permissionsEdit', 'id' => $datasetID], [query => $query]  );
+    $link = $context->url( 'dataset', ['action' => 'permissionsEdit', 'id' => $datasetID], ['query' => $query]  );
     $btnClass = "btn btn-sm ";
     if ($permEnabled) {
         $label = "enabled";
