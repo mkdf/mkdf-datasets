@@ -452,21 +452,56 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
      * -1 = logged in
      * -2 - everyone/anonymous
      * Permissions/Actions:
-     * R - Read/subscribe
-     * W - Write/Push data
-     * V - View listing
-     * D - Delete
-     * G - Grant permissions
+     * r - Read/subscribe
+     * w - Write/Push data
+     * v - View listing
+     * d - Delete
+     * g - Grant permissions
      * @param int $dataset_id
-     * @param array $permissions
      */
-    public function setDefaultDatasetPermissions($dataset_id, $permissions = []) {
-        if ($permissions == []) {
-            $permissions = [
-                '0'  => ['R', 'W', 'V', 'D', 'G'],
-                '-1' => ['R', 'V'],
-                '-2' => ['V']
-            ];
+    public function setDefaultDatasetPermissions($dataset_id) {
+        // Default permissions
+        $permissions = [
+            'owner'  => [
+                'v'        => 1,
+                'r'        => 1,
+                'w'        => 1,
+                'd'        => 1,
+                'g'        => 1
+            ],
+            'user' => [
+                'v'        => 1,
+                'r'        => 1,
+                'w'        => 0,
+                'd'        => 0,
+                'g'        => 0
+
+            ],
+            'anonymous' => [
+                'v'        => 1,
+                'r'        => 0,
+                'w'        => 0,
+                'd'        => 0,
+                'g'        => 0
+            ]
+        ];
+
+        // Default permissions from configuration (if exists)
+        if ( array_key_exists('mkdf-datasets', $this->_config) &&
+        array_key_exists('default_permissions', $this->_config['mkdf-datasets'])){
+            $default_permissions = $this->_config['mkdf-datasets']['default_permissions'];
+            // Configuration allows two keys: user and anonymous ('owner' could be supported as well but is currently not)
+            foreach (['user','anonymous'] as $key ) {
+                if ( array_key_exists($key, $default_permissions)){
+                    foreach( ['r', 'w', 'v', 'd', 'g'] as $per){
+                        if( in_array($per, array_map('strtolower', $default_permissions[$key] ))){
+                            $permissions[$key] [$per] = 1;
+                        }else{
+                            $permissions[$key] [$per] = 0;
+                        }
+                    }
+                }
+            }
         }
 
         //FIRST, DELETE ALL PERMISSIONS IN THE DB RELATING TO THIS DATASET
@@ -482,11 +517,11 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $parameters = [
             'dataset_id'    => $dataset_id,
             'role_id'       => 0, //dataset owner
-            'v'        => 1,
-            'r'        => 1,
-            'w'        => 1,
-            'd'        => 1,
-            'g'        => 1
+            'v'        => $permissions['owner']['v'],
+            'r'        => $permissions['owner']['r'],
+            'w'        => $permissions['owner']['w'],
+            'd'        => $permissions['owner']['d'],
+            'g'        => $permissions['owner']['g']
         ];
         $statement = $this->_adapter->createStatement($this->getQuery('insertPermission'));
         $statement->execute($parameters);
@@ -494,11 +529,11 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $parameters = [
             'dataset_id'    => $dataset_id,
             'role_id'       => -1, //logged in user
-            'v'        => 1,
-            'r'        => 1,
-            'w'        => 0,
-            'd'        => 0,
-            'g'        => 0
+            'v'        => $permissions['user']['v'],
+            'r'        => $permissions['user']['r'],
+            'w'        => $permissions['user']['w'],
+            'd'        => $permissions['user']['d'],
+            'g'        => $permissions['user']['g']
         ];
         $statement = $this->_adapter->createStatement($this->getQuery('insertPermission'));
         $statement->execute($parameters);
@@ -506,11 +541,11 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $parameters = [
             'dataset_id'    => $dataset_id,
             'role_id'       => -2, //anonymous
-            'v'        => 1,
-            'r'        => 0,
-            'w'        => 0,
-            'd'        => 0,
-            'g'        => 0
+            'v'        => $permissions['anonymous']['v'],
+            'r'        => $permissions['anonymous']['r'],
+            'w'        => $permissions['anonymous']['w'],
+            'd'        => $permissions['anonymous']['d'],
+            'g'        => $permissions['anonymous']['g']
         ];
         $statement = $this->_adapter->createStatement($this->getQuery('insertPermission'));
         $statement->execute($parameters);
