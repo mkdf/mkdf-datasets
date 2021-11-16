@@ -37,6 +37,11 @@ $form->prepare();
     <?= $this->formElementErrors($form->get('description')); ?>
 </div>
 
+<!--
+***
+* - Dataset type selection obsolete for now
+* - All datasets are of type 'stream', which now also includes the ability to store files.
+***
 <div class="form-group">
     <label class="form-check-label" for="<?= $form->get('datasetTypes')->getName()?>"><?= $form->get('datasetTypes')->getLabel()?></label>
     <?php
@@ -61,6 +66,8 @@ $form->prepare();
         </div>
     <?php endforeach; ?>
 </div>
+-->
+<input type="hidden" name="datasetTypes" value="1">
 
 <div class="form-group">
     <?= $this->formElement($form->get('submit')); ?>
