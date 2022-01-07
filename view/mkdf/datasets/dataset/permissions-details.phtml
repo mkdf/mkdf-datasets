@@ -5,8 +5,11 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            <h2>Permissions</h2>
+            <h2>Access control</h2>
             <?= $this->partial('mkdf/datasets/partial/dataset-permissions', ['permissions' => $permissions] ) ?>
+            <hr class="mb-4 mt-4" />
+            <h2>Keys registered to this dataset</h2>
+            <?= $this->partial('mkdf/datasets/partial/dataset-keys', ['dataset' => $dataset, 'keys' => $keys] ) ?>
         </div>
     </div>
 </div>

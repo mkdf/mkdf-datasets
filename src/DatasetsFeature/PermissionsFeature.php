@@ -26,7 +26,7 @@ class PermissionsFeature implements DatasetsFeatureInterface {
         return true;
     }
     public function getLabel(){
-        return '<i class="fas fa-eye-slash"></i> Permissions';
+        return '<i class="fas fa-eye-slash"></i> Access control';
     }
     public function isActive(){
         return $this->active;

@@ -1,0 +1,34 @@
+<table  class="table table-bordered">
+    <tr>
+        <th>User</th>
+        <th>Name</th>
+        <th>Key name</th>
+        <th>Access</th>
+    </tr>
+    <?php foreach($keys as $key): ?>
+
+    <?php
+        $permissionLabel = '';
+        switch ($key['permission']) {
+            case 'a':
+                $permissionLabel = 'read/write';
+                break;
+            case 'r':
+                $permissionLabel = 'read';
+                break;
+            case 'w':
+                $permissionLabel = 'write';
+                break;
+            default:
+                $permissionLabel = 'unknown';
+        }
+    ?>
+        <tr>
+            <td><?= $key['userEmail']; ?></td>
+            <td><?= $key['userFullname']; ?></td>
+            <td><?= $key['keyName']; ?></td>
+            <td><em><?= $permissionLabel; ?></em></td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+

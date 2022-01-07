@@ -13,6 +13,7 @@ use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
 use MKDF\Datasets\Service\DatasetPermissionManager;
 use MKDF\Datasets\Service\DatasetPermissionManagerInterface;
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
+use MKDF\Keys\Repository\MKDFKeysRepositoryInterface;
 use MKDF\Datasets\Service\Factory\DatasetPermissionManagerFactory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -25,12 +26,14 @@ class DatasetController extends AbstractActionController
 {
     private $config;
     private $_repository;
+    private $_keys_repository;
     private $_permissionManager;
 
-    public function __construct(MKDFDatasetRepositoryInterface $repository, array $config, DatasetPermissionManager $permissionManager)
+    public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, array $config, DatasetPermissionManager $permissionManager)
     {
         $this->config = $config;
         $this->_repository = $repository;
+        $this->_keys_repository = $keysRepository;
         $this->_permissionManager = $permissionManager;
     }
 
@@ -135,8 +138,10 @@ class DatasetController extends AbstractActionController
             'class' => '',
             'buttons' => []
         ];
+        $keys = null;
         if ($can_edit) {
             $actions['buttons'][] = ['type'=>'warning','label'=>'Edit', 'icon'=>'edit', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'edit']];
+            $keys = $this->_keys_repository->allDatasetKeys($id);
         }
         if ($can_delete) {
             $actions['buttons'][] = ['type'=>'danger','label'=>'Delete', 'icon'=>'delete', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'delete-confirm']];
@@ -149,7 +154,9 @@ class DatasetController extends AbstractActionController
                 'permissions' => $permissions,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
                 'actions' => $actions,
-                'myDataset' => $myDataset
+                'myDataset' => $myDataset,
+                'can_edit' => $can_edit,
+                'keys' => $keys
             ]);
         }
         else {
@@ -163,7 +170,9 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $keys = null;
         if ($can_edit) {
+            $keys = $this->_keys_repository->allDatasetKeys($id);
             $permissions = $this->_repository->findDatasetPermissions($id);
             $message = "Dataset: " . $id;
             return new ViewModel([
@@ -171,6 +180,7 @@ class DatasetController extends AbstractActionController
                 'dataset' => $dataset,
                 'permissions' => $permissions,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                'keys' => $keys
             ]);
         }
         else {
