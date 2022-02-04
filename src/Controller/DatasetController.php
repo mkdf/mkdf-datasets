@@ -346,7 +346,9 @@ class DatasetController extends AbstractActionController
             $valid_token = ($container->delete_token == $token);
             if ($valid_token) {
                 // Disable key access here...
-                $this->_stream_repository->removePermission($dataset->uuid, $keyPassed);
+                $keyReturned = $this->_keys_repository->getKeyUuidFromId($keyPassed);
+                $keyUUID = $keyReturned['uuid'];
+                $this->_stream_repository->removePermission($dataset->uuid, $keyUUID);
                 $this->_keys_repository->setKeyPermission($keyPassed, $id, 'd');
                 $this->flashMessenger()->addMessage('Disabled key access for dataset.');
                 return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
