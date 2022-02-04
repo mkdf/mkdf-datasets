@@ -4,6 +4,7 @@
         <th>Name</th>
         <th>Key name</th>
         <th>Access</th>
+        <th>Actions</th>
     </tr>
     <?php foreach($keys as $key): ?>
 
@@ -19,15 +20,49 @@
             case 'w':
                 $permissionLabel = 'write';
                 break;
+            case 'd':
+                $permissionLabel = 'disabled';
+                break;
             default:
                 $permissionLabel = 'unknown';
         }
     ?>
-        <tr>
+        <?php
+            $deleteAction = [
+                'class'=>'btn-group-sm',
+                'buttons'=>[
+                    ['type'=>'primary',
+                        'label'=>'Disable',
+                        'icon' => 'delete',
+                        'target'=> 'dataset',
+                        'params'=> [
+                            'id' => $dataset->id,
+                            'action' => 'disablekey'
+                        ],
+                        'query' => [
+                            'key' => $key['keyID']
+                        ]
+                    ],
+                ]
+            ];
+        ?>
+        <?php
+            if ($key['permission'] == 'd') {
+                print('<tr class="table-secondary">');
+            }
+            else {
+                print('<tr>');
+            }
+        ?>
             <td><?= $key['userEmail']; ?></td>
             <td><?= $key['userFullname']; ?></td>
             <td><?= $key['keyName']; ?></td>
             <td><em><?= $permissionLabel; ?></em></td>
+            <td>
+                <?php if(($user_id != $key['userID']) && ($key['permission'] != 'd')): ?>
+                    <?= $this->partial('mkdf/core/partial/actions', $deleteAction); ?>
+                <?php endif; ?>
+            </td>
         </tr>
     <?php endforeach; ?>
 </table>

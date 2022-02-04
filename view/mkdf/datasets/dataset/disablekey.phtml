@@ -1,0 +1,9 @@
+<h1>Disable key access</h1>
+<?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+<!-- Token: <?= $token ?> -->
+<p><em>Note that the key access will be removed for this dataset, but the key will remain listed against this dataset as <strong>disabled</strong></em></p>
+<?= $this->partial('mkdf/core/partial/actions', [
+    'buttons'=>[
+        ['type'=>'danger','label'=>'Yes, remove this key\'s access', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'disablekey'], 'query' => ['token' => $token, 'key' => $key]],
+        ['type'=>'secondary','label'=>'No, go back please', 'target'=> 'dataset', 'params'=> ['id' => $dataset->id, 'action' => 'permissions-details']]]
+] ); ?>

@@ -14,6 +14,7 @@ use MKDF\Datasets\Service\DatasetPermissionManager;
 use MKDF\Datasets\Service\DatasetPermissionManagerInterface;
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
 use MKDF\Keys\Repository\MKDFKeysRepositoryInterface;
+use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
 use MKDF\Datasets\Service\Factory\DatasetPermissionManagerFactory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -27,13 +28,15 @@ class DatasetController extends AbstractActionController
     private $config;
     private $_repository;
     private $_keys_repository;
+    private $_stream_repository;
     private $_permissionManager;
 
-    public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, array $config, DatasetPermissionManager $permissionManager)
+    public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, MKDFStreamRepositoryInterface $stream_repository, array $config, DatasetPermissionManager $permissionManager)
     {
         $this->config = $config;
         $this->_repository = $repository;
         $this->_keys_repository = $keysRepository;
+        $this->_stream_repository = $stream_repository;
         $this->_permissionManager = $permissionManager;
     }
 
@@ -171,16 +174,30 @@ class DatasetController extends AbstractActionController
         $user_id = $this->currentUser()->getId();
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $keys = null;
+
+        $messages = [];
+        $flashMessenger = $this->flashMessenger();
+        if ($flashMessenger->hasMessages()) {
+            foreach($flashMessenger->getMessages() as $flashMessage) {
+                $messages[] = [
+                    'type' => 'warning',
+                    'message' => $flashMessage
+                ];
+            }
+        }
+
         if ($can_edit) {
             $keys = $this->_keys_repository->allDatasetKeys($id);
             $permissions = $this->_repository->findDatasetPermissions($id);
             $message = "Dataset: " . $id;
             return new ViewModel([
                 'message' => $message,
+                'messages' => $messages,
                 'dataset' => $dataset,
                 'permissions' => $permissions,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'keys' => $keys
+                'keys' => $keys,
+                'user_id' => $user_id,
             ]);
         }
         else {
@@ -291,6 +308,60 @@ class DatasetController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage('Unauthorised to edit dataset permissions.');
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
         }
+    }
+
+    public function disablekeyAction () {
+        $user_id = $this->currentUser()->getId();
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $keyPassed = $this->params()->fromQuery('key', null);
+        $token = $this->params()->fromQuery('token', null);
+
+        //Does the user have edit rights on this dataset? If not, fail.
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        if (!$can_edit) {
+            $this->flashMessenger()->addMessage('Disable key failed: You do not have access to manage this dataset\'s permissions.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id' => $id]);
+        }
+
+        if (is_null($token)) {
+            $token = uniqid(true);
+            $container = new Container('Disable_Key');
+            $container->delete_token = $token;
+            $messages[] = [
+                'type'=> 'warning',
+                'message' => 'Are you sure you want to disable this key\'s access to the dataset? Applications will no longer have access to the dataset with this key.'
+            ];
+            return new ViewModel(
+                [
+                    'dataset' => $dataset,
+                    'token' => $token,
+                    'key' => $keyPassed,
+                    'messages' => $messages
+                ]
+            );
+        }
+        else {
+            $container = new Container('Disable_Key');
+            $valid_token = ($container->delete_token == $token);
+            if ($valid_token) {
+                // Disable key access here...
+                $this->_stream_repository->removePermission($dataset->uuid, $keyPassed);
+                $this->_keys_repository->setKeyPermission($keyPassed, $id, 'd');
+                $this->flashMessenger()->addMessage('Disabled key access for dataset.');
+                return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+            }
+        }
+
+        // IS TOKEN NULL, present confirmation page
+        // ELSE
+        // CHECK TOKEN
+        // STREAM REPOSITORY -> REMOVE PERMISSION
+        // KEYS REPOSITORY -> SET PERMISSIONS TO 'D'
+        // RETURN WITH SUCCESS MESSAGE
+
+
+
     }
 
     public function addAction(){
