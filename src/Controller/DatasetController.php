@@ -132,6 +132,18 @@ class DatasetController extends AbstractActionController
         $myDataset = ($dataset->user_id == $user_id) ? true : false;
         $permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
+
+        $messages = [];
+        $flashMessenger = $this->flashMessenger();
+        if ($flashMessenger->hasMessages()) {
+            foreach($flashMessenger->getMessages() as $flashMessage) {
+                $messages[] = [
+                    'type' => 'warning',
+                    'message' => $flashMessage
+                ];
+            }
+        }
+
         $actions = [];
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
@@ -153,6 +165,7 @@ class DatasetController extends AbstractActionController
         if ($can_view) {
             return new ViewModel([
                 'message' => $message,
+                'messages' => $messages,
                 'dataset' => $dataset,
                 'permissions' => $permissions,
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),

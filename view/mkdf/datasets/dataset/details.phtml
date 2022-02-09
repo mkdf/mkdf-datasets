@@ -9,6 +9,7 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
             <h2>Overview</h2>
             <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 
