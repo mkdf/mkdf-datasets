@@ -323,6 +323,38 @@ class DatasetController extends AbstractActionController
         }
     }
 
+    public function enablekeyAction ()
+    {
+        $user_id = $this->currentUser()->getId();
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $keyPassed = $this->params()->fromQuery('key', null);
+
+        //Does the user have edit rights on this dataset? If not, fail.
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        if (!$can_edit) {
+            $this->flashMessenger()->addMessage('Disable key failed: You do not have access to manage this dataset\'s permissions.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id' => $id]);
+        }
+
+        // Enable key access here...
+        $keyReturned = $this->_keys_repository->getKeyUuidFromId($keyPassed);
+        $keyUUID = $keyReturned['uuid'];
+        try {
+            $newPermission = $this->_keys_repository->restoreKeyPermission($keyPassed, $id);
+        }
+        catch(Exception $e) {
+            $message = 'Error: ' .$e->getMessage();
+            $this->flashMessenger()->addMessage($message);
+            return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+        }
+        $this->_stream_repository->setPermission($dataset->uuid, $keyUUID, $newPermission);
+        //$this->_keys_repository->setKeyPermission($keyPassed, $id, 'd');
+
+        $this->flashMessenger()->addMessage('The selected key has been reactived on this dataset.');
+        return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+    }
+
     public function disablekeyAction () {
         $user_id = $this->currentUser()->getId();
         $id = (int) $this->params()->fromRoute('id', 0);
@@ -362,6 +394,7 @@ class DatasetController extends AbstractActionController
                 $keyReturned = $this->_keys_repository->getKeyUuidFromId($keyPassed);
                 $keyUUID = $keyReturned['uuid'];
                 $this->_stream_repository->removePermission($dataset->uuid, $keyUUID);
+                // Set key to disabled state in keys repository
                 $this->_keys_repository->setKeyPermission($keyPassed, $id, 'd');
                 $this->flashMessenger()->addMessage('Disabled key access for dataset.');
                 return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);

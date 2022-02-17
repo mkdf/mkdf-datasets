@@ -21,6 +21,9 @@
                 $permissionLabel = 'write';
                 break;
             case 'd':
+            case 'A':
+            case 'R':
+            case 'W':
                 $permissionLabel = 'disabled';
                 break;
             default:
@@ -31,7 +34,7 @@
             $deleteAction = [
                 'class'=>'btn-group-sm',
                 'buttons'=>[
-                    ['type'=>'primary',
+                    ['type'=>'danger',
                         'label'=>'Disable',
                         'icon' => 'delete',
                         'target'=> 'dataset',
@@ -45,9 +48,27 @@
                     ],
                 ]
             ];
+
+        $enableAction = [
+            'class'=>'btn-group-sm',
+            'buttons'=>[
+                ['type'=>'primary',
+                    'label'=>'Enable',
+                    'icon' => 'create',
+                    'target'=> 'dataset',
+                    'params'=> [
+                        'id' => $dataset->id,
+                        'action' => 'enablekey'
+                    ],
+                    'query' => [
+                        'key' => $key['keyID']
+                    ]
+                ],
+            ]
+        ];
         ?>
         <?php
-            if ($key['permission'] == 'd') {
+            if ($permissionLabel == 'disabled') {
                 print('<tr class="table-secondary">');
             }
             else {
@@ -59,8 +80,11 @@
             <td><?= $key['keyName']; ?></td>
             <td><em><?= $permissionLabel; ?></em></td>
             <td>
-                <?php if(($user_id != $key['userID']) && ($key['permission'] != 'd')): ?>
+                <?php if(($user_id != $key['userID']) && ($permissionLabel != 'disabled')): ?>
                     <?= $this->partial('mkdf/core/partial/actions', $deleteAction); ?>
+                <?php endif; ?>
+                <?php if(($user_id != $key['userID']) && ($permissionLabel == 'disabled')): ?>
+                    <?= $this->partial('mkdf/core/partial/actions', $enableAction); ?>
                 <?php endif; ?>
             </td>
         </tr>
