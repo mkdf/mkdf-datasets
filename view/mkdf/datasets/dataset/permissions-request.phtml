@@ -1,3 +1,41 @@
+<?php
+function getAccessLevelsFromPermissions($permissionsInput, $user_id){
+    $permissionsReturn = [
+        'view' => false,
+        'read' => false,
+        'write' => false,
+        'manage' => false
+    ];
+    // First, set the default permissions for all logged in users.
+    foreach ($permissionsInput as $permission) {
+        // Search for the default "logged-in" permission
+        if ($permission->role_id == -1) {
+            // Found it
+            $permissionsReturn['view'] = $permission->v;
+            $permissionsReturn['read'] = $permission->r;
+            $permissionsReturn['write'] = $permission->w;
+            $permissionsReturn['manage'] = $permission->g;
+        }
+    }
+    // Then see if there are any user-specific permissions set for this user
+    //echo('userid:'.$user_id);
+    foreach ($permissionsInput as $permission) {
+        // Search for user specific permissions
+        // FIXME - Find user ID here...
+
+        if ($permission->role_id == $user_id) {
+            // Found it
+            //echo('found user perm:'.print_r($permission));
+            $permissionsReturn['view'] = $permission->v;
+            $permissionsReturn['read'] = $permission->r;
+            $permissionsReturn['write'] = $permission->w;
+            $permissionsReturn['manage'] = $permission->g;
+        }
+    }
+    return $permissionsReturn;
+}
+$myPermissions = getAccessLevelsFromPermissions($permissions,$user_id);
+?>
 <h1><?= $dataset->title ?></h1>
 <div class="container">
     <div class="row">
@@ -5,16 +43,19 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-
             <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
 
-            <h2>My access to this dataset</h2>
-            <?= $this->partial('mkdf/datasets/partial/my-dataset-access', ['dataset' => $dataset, 'keys' => $keys, 'accessRequests' => $accessRequests, 'user_id' => $user_id] ) ?>
+            <div class="row">
+                <div class="col-md-4">
+                    <h2>My access</h2>
+                    <?= $this->partial('mkdf/datasets/partial/my-dataset-access', ['dataset' => $dataset, 'permissions' => $permissions, 'accessRequests' => $accessRequests, 'user_id' => $user_id, 'myPermissions' => $myPermissions] ) ?>
+                </div>
+                <div class="col-md-8">
+                    <h2>Request additional access</h2>
+                    <?= $this->partial('mkdf/datasets/partial/request-access', ['dataset' => $dataset, 'keys' => $keys, 'accessRequests' => $accessRequests, 'user_id' => $user_id, 'myPermissions' => $myPermissions] ) ?>
+                </div>
+            </div>
 
-            <hr class="mb-4 mt-4" />
-
-            <h2>Request additional access</h2>
-            <?= $this->partial('mkdf/datasets/partial/request-access', ['dataset' => $dataset, 'keys' => $keys, 'accessRequests' => $accessRequests, 'user_id' => $user_id] ) ?>
 
             <hr class="mb-4 mt-4" />
 

@@ -63,6 +63,17 @@ class DatasetController extends AbstractActionController
             ];
         }
 
+        $messages = [];
+        $flashMessenger = $this->flashMessenger();
+        if ($flashMessenger->hasMessages()) {
+            foreach($flashMessenger->getMessages() as $flashMessage) {
+                $messages[] = [
+                    'type' => 'warning',
+                    'message' => $flashMessage
+                ];
+            }
+        }
+
         $txtSearch = $this->params()->fromQuery('txt', "");
         if ($txtSearch == ""){
             $datasetCollection = $this->_repository->findAllDatasets($userId);
@@ -78,6 +89,7 @@ class DatasetController extends AbstractActionController
         $paginator->setItemCountPerPage(10);
         return new ViewModel([
             'message' => 'Datasets ',
+            'messages' => $messages,
             'datasets' => $paginator,
             'currentUserId' => $user->getId(),
             'actions' => $actions,
@@ -177,7 +189,7 @@ class DatasetController extends AbstractActionController
             ]);
         }
         else {
-            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            $this->flashMessenger()->addMessage('Unauthorised to view dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
     }
@@ -290,6 +302,124 @@ class DatasetController extends AbstractActionController
         }
 
     }
+
+    public function accessRequestRespondAction () {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $requestUser = $this->params()->fromQuery('user', null);
+        $requestAccessLevel = $this->params()->fromQuery('accessLevel', null);
+
+        $user_id = $this->currentUser()->getId();
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
+        $can_read = $this->_permissionManager->canRead($dataset,$user_id);
+        $can_write = $this->_permissionManager->canWrite($dataset,$user_id);
+
+        $messages = [];
+        $flashMessenger = $this->flashMessenger();
+        if ($flashMessenger->hasMessages()) {
+            foreach($flashMessenger->getMessages() as $flashMessage) {
+                $messages[] = [
+                    'type' => 'warning',
+                    'message' => $flashMessage
+                ];
+            }
+        }
+
+        if ($can_edit) {
+            // TODO - logic as follows
+            /*
+             * Check if POST data.
+             * if not POST, return ViewModel to show a form that asks for response text and an accept/reject decision
+             * if POST:
+             *  - if ACCEPT
+             *      - Check if user already added to ACL
+             *          - If so, add requested permissions & email confirmation
+             *          - If not, add user row, then add requested permission & email confirmation
+             *      - Update access request table
+             *  - if REJECT
+             *      - Email details to requester
+             *      - Update access request table
+             */
+
+            if($this->getRequest()->isPost()) {
+                $data = $this->params()->fromPost();
+
+                $description = $data['description'];
+                $decisionAccept = $data['decision'];
+
+                switch ($requestAccessLevel) {
+                    case 'a':
+                        $accessLevelLabel = 'read/write';
+                        break;
+                    case 'r':
+                        $accessLevelLabel = 'read';
+                        break;
+                    case 'w':
+                        $accessLevelLabel = 'write';
+                        break;
+                    case 'g':
+                        $accessLevelLabel = 'manage';
+                        break;
+                    default:
+                        $accessLevelLabel = 'unknown';
+                }
+
+                if ($decisionAccept == "APPROVE") {
+                    // APPROVE logic
+                    // Check if user is already in ACL
+                    // If so, add permissions and email
+                    // If not, add user to ACL, add permissions and email
+                    // Update access request table
+                    $this->flashMessenger()->addMessage('Approved request: '.$requestUser.' ('.$accessLevelLabel.' access)');
+                    return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+                }
+                else {
+                    // REJECT logic
+                    // Email requester to inform them of the decision
+                    // BUILD EMAIL BODY FOR REJECT MESSAGE
+                    $body = "Your request for [xxxxx] access to [xxxx] dataset was rejected.\r\n\r\n";
+
+                    $body = $body . "\r\n";
+
+                    // UPDATE REQUESTS DATASET
+                    //$this->_stream_repository->createAccessRequest ($dataset->uuid, $this->identity(), $accessLevelCode, $data['description']);
+
+                    // SEND EMAIL TO REQUESTER
+                    $mail = new Mail\Message();
+                    $mail->setBody($body);
+                    $fromEmail = $this->config['email']['from-email'];
+                    $fromLabel = $this->config['email']['from-label'];
+                    $mail->setFrom($fromEmail, $fromLabel);
+                    $mail->addTo('jason.carvalho@open.ac.uk', 'Jason Carvalho'); // FIXME - needs to be the requester here
+                    $mail->setSubject('Access to dataset');
+
+                    $transport = new Mail\Transport\Sendmail();
+                    $transport->send($mail);
+
+                    // Update access request table
+                    $this->flashMessenger()->addMessage('Rejected request: '.$requestUser.' ('.$accessLevelLabel.' access)');
+                    return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+                }
+            }
+            else { // Not POST
+                // Not a POST request, display the request response form.
+                return new ViewModel([
+                    'messages' => $messages,
+                    'dataset' => $dataset,
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'user_id' => $user_id,
+                    'requestUser' => $requestUser,
+                    'requestAccessLevel' => $requestAccessLevel
+                ]);
+            }
+        }
+        else {
+            // (!$can_edit)
+            $this->flashMessenger()->addMessage('Unauthorised to respond to access requests.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+        }
+    }
     
     public function permissionsDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
@@ -326,7 +456,7 @@ class DatasetController extends AbstractActionController
             ]);
         }
         else {
-            $this->flashMessenger()->addMessage('Unauthorised to view dataset permissions.');
+            //$this->flashMessenger()->addMessage('Unauthorised to view dataset permissions.');
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-request', 'id' => $id]);
         }
     }
@@ -347,11 +477,19 @@ class DatasetController extends AbstractActionController
                     return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
                 }
 
-                //INSERT PERMISSIONS HERE...
-                $this->_repository->createDatasetPermission($id,$userId,0,0,0,0,0);
+                if ($this->_permissionManager->hasCustomAccess($dataset,$userId)) {
+                    $this->flashMessenger()->addMessage('Unable to add user to dataset permissions - user already exists. Please make changes by amending existing permissions.');
+                    return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+                }
+                else {
+                    //INSERT PERMISSIONS HERE...
+                    $this->_repository->createDatasetPermission($id,$userId,0,0,0,0,0);
 
-                $this->flashMessenger()->addMessage('User '.$data['inputEmail'].' added to dataset permissions.');
-                return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+                    $this->flashMessenger()->addMessage('User '.$data['inputEmail'].' added to dataset permissions.');
+                    return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+                }
+
+
             }
             else {
                 $this->flashMessenger()->addMessage('Unable to add user to dataset permissions - error with form data');

@@ -49,6 +49,7 @@
         <th>Reason</th>
         <th>Access</th>
         <th>Status</th>
+        <th>Action</th>
     </tr>
     <?php foreach($accessRequests as $arItem): ?>
         <?php
@@ -60,6 +61,19 @@
             <td><?= $arItem->request; ?></td>
             <td><?= $label; ?></td>
             <td class="<?= $statusClass; ?>"><em><?= $arItem->status; ?></em></td>
+            <td>
+                <?php if ($arItem->status == 'pending'): ?>
+                    <?php
+                        $query = [
+                            'user' => $arItem->user,
+                            'accessLevel' => $arItem->accessLevel,
+                        ];
+                        $link = $this->url( 'dataset', ['action' => 'accessRequestRespond', 'id' => $dataset->id], ['query' => $query]  );
+                    ?>
+
+                    <a class="btn btn-sm btn-primary" href="<?= $link; ?>"><i class="fas fa-reply"></i> Respond</a>
+                <?php endif; ?>
+            </td>
         </tr>
     <?php endforeach; ?>
 </table>

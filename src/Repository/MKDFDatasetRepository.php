@@ -308,6 +308,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
             'd' => 0,
             'g' => 0
         ];
+        //$permissions = false;
         $parameters = [
             'dataset_id'    => $datasetID,
             'role_id'       => $roleID
@@ -316,6 +317,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $result    = $statement->execute($parameters);
         if ($result instanceof ResultInterface && $result->isQueryResult()) {
             $permissions = $result->current();
+            print_r($permissions);
         }
         return $permissions;
     }

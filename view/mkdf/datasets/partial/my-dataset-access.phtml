@@ -1,6 +1,49 @@
-<table class="table table-bordered">
-    <tr class="table-active">
-        <th>Dataset</th>
-        <th>Access Level</th>
-    </tr>
-</table>
+<?= $this->partial('mkdf/datasets/partial/help-access-view', [] ) ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-read', [] ) ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-write', [] ) ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-manage', [] ) ?>
+
+            <?php if ($myPermissions['view']): ?>
+                <a href="#" data-toggle="modal" data-target="#viewHelpModal">
+                    <h5 class="text-dark"><span class="text-success"><i class="fas fa-check-circle"></i></span> View</h5>
+                </a>
+            <?php else: ?>
+                <a href="#" data-toggle="modal" data-target="#viewHelpModal">
+                    <h5 class="text-dark"><span class="text-danger"><i class="fas fa-times-circle"></i></span> View</h5>
+                </a>
+            <?php endif; ?>
+
+
+            <?php if ($myPermissions['read']): ?>
+                <a href="#" data-toggle="modal" data-target="#readHelpModal">
+                    <h5 class="text-dark"><span class="text-success"><i class="fas fa-check-circle"></i></span> Read</h5>
+                </a>
+            <?php else: ?>
+                <a href="#" data-toggle="modal" data-target="#readHelpModal">
+                    <h5 class="text-dark"><span class="text-danger"><i class="fas fa-times-circle"></i></span> Read</h5>
+                </a>
+            <?php endif; ?>
+
+
+            <?php if ($myPermissions['write']): ?>
+                <a href="#" data-toggle="modal" data-target="#writeHelpModal">
+                    <h5 class="text-dark"><span class="text-success"><i class="fas fa-check-circle"></i></span> Write</h5>
+                </a>
+            <?php else: ?>
+                <a href="#" data-toggle="modal" data-target="#writeHelpModal">
+                    <h5 class="text-dark"><span class="text-danger"><i class="fas fa-times-circle"></i></span> Write</h5>
+                </a>
+            <?php endif; ?>
+
+            <?php if ($myPermissions['manage']): ?>
+                <a href="#" data-toggle="modal" data-target="#manageHelpModal">
+                    <h5 class="text-dark"><span class="text-success"><i class="fas fa-check-circle"></i></span> Manage</h5>
+                </a>
+            <?php else: ?>
+                <a href="#" data-toggle="modal" data-target="#manageHelpModal">
+                    <h5 class="text-dark"><span class="text-danger"><i class="fas fa-times-circle"></i></span> Manage</h5>
+                </a>
+            <?php endif; ?>
+
+
+
