@@ -368,11 +368,29 @@ class DatasetController extends AbstractActionController
                 if ($decisionAccept == "APPROVE") {
                     // APPROVE logic
                     // Check if user is already in ACL
-                    // If so, add permissions and email
-                    // If not, add user to ACL, add permissions and email
-                    // Update access request table
+                    $requestUserId =  $this->userIdFromEmail($requestUser);
+                    if (!$this->_permissionManager->hasCustomAccess($dataset,$requestUserId))  {
+                        $defaultPerms = $this->_repository->findDatasetRolePermission($id, -1);
+                        //add custom user with default "logged in" permissions
+                        $this->_repository->createDatasetPermission($id,$requestUserId,$defaultPerms['v'],$defaultPerms['r'],$defaultPerms['w'],0,$defaultPerms['g']);
+                    }
+                    // now update permissions
+                    if ($requestAccessLevel == 'a'){
+                        // 'a' is a shortcut for both 'r' and 'w'
+                        $this->_repository->updateDatasetPermission($id, $requestUserId, 'r', 1);
+                        $this->_repository->updateDatasetPermission($id, $requestUserId, 'w', 1);
+                    }
+                    else {
+                        $this->_repository->updateDatasetPermission($id, $requestUserId, $requestAccessLevel, 1);
+                    }
+
                     $this->flashMessenger()->addMessage('Approved request: '.$requestUser.' ('.$accessLevelLabel.' access)');
                     return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+
+                    // TODO - Send email.
+
+                    // TODO - Update access request table
+
                 }
                 else {
                     // REJECT logic
