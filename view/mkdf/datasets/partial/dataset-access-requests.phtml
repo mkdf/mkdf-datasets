@@ -29,11 +29,11 @@
             case 'pending':
                 $statusClass = 'bg-warning opacity-30';
                 break;
-            case 'declined':
-                $statusClass = 'bg-danger opacity-30';
+            case 'rejected':
+                $statusClass = 'bg-danger text-white opacity-30';
                 break;
             case 'accepted':
-                $statusClass = 'bg-success opacity-30';
+                $statusClass = 'bg-success text-white opacity-30';
                 break;
             default:
                 $statusClass = '';
@@ -58,7 +58,14 @@
         ?>
         <tr>
             <td><?= $arItem->user; ?></td>
-            <td><?= $arItem->request; ?></td>
+            <td>
+                <em><strong>Request:</strong></em><br />
+                <?= $arItem->request; ?><br />
+                <?php if ($arItem->response): ?>
+                    <em><strong>Response:</strong></em><br />
+                    <?= $arItem->response; ?><br />
+                <?php endif; ?>
+            </td>
             <td><?= $label; ?></td>
             <td class="<?= $statusClass; ?>"><em><?= $arItem->status; ?></em></td>
             <td>
@@ -67,6 +74,7 @@
                         $query = [
                             'user' => $arItem->user,
                             'accessLevel' => $arItem->accessLevel,
+                            'arId' => $arItem->_id,
                         ];
                         $link = $this->url( 'dataset', ['action' => 'accessRequestRespond', 'id' => $dataset->id], ['query' => $query]  );
                     ?>

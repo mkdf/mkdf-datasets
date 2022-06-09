@@ -244,6 +244,9 @@ class DatasetController extends AbstractActionController
 
             $fromEmail = $this->config['email']['from-email'];
             $fromLabel = $this->config['email']['from-label'];
+            $ownerDetails = $this->_repository->getDatasetOwner($id);
+            $toEmail = $ownerDetails['email'];
+            $toLabel = $ownerDetails['full_name'];
             $accessControlLink = $this->url( 'dataset', ['action' => 'permissions-details', 'id' => $dataset->id], ['query' => ''] );
 
             $accessLevelLabel = '';
@@ -271,7 +274,7 @@ class DatasetController extends AbstractActionController
             }
 
             // BUILD EMAIL REQUEST BODY
-            $body = "A user requested access to a Linked Data Hub dataset that you manage.\r\n\r\n";
+            $body = "A user requested access to a SPICE Linked Data Hub dataset that you manage.\r\n\r\n";
             $body = $body . "Linked Data Hub user: ".$this->identity()."\r\n";
             $body = $body . "Dataset title: ".$dataset->title."\r\n";
             $body = $body . "Dataset uuid: ".$dataset->uuid."\r\n";
@@ -288,8 +291,8 @@ class DatasetController extends AbstractActionController
             $mail = new Mail\Message();
             $mail->setBody($body);
             $mail->setFrom($fromEmail, $fromLabel);
-            $mail->addTo('jason.carvalho@open.ac.uk', 'Jason Carvalho');
-            $mail->setSubject('A user requested dataset access');
+            $mail->addTo($toEmail, $toLabel);
+            $mail->setSubject('A user requested access to a SPICE dataset');
 
             $transport = new Mail\Transport\Sendmail();
             $transport->send($mail);
@@ -308,6 +311,7 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $requestUser = $this->params()->fromQuery('user', null);
         $requestAccessLevel = $this->params()->fromQuery('accessLevel', null);
+        $arId = $this->params()->fromQuery('arId', null);
 
         $user_id = $this->currentUser()->getId();
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
@@ -327,20 +331,6 @@ class DatasetController extends AbstractActionController
         }
 
         if ($can_edit) {
-            // TODO - logic as follows
-            /*
-             * Check if POST data.
-             * if not POST, return ViewModel to show a form that asks for response text and an accept/reject decision
-             * if POST:
-             *  - if ACCEPT
-             *      - Check if user already added to ACL
-             *          - If so, add requested permissions & email confirmation
-             *          - If not, add user row, then add requested permission & email confirmation
-             *      - Update access request table
-             *  - if REJECT
-             *      - Email details to requester
-             *      - Update access request table
-             */
 
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
@@ -384,19 +374,9 @@ class DatasetController extends AbstractActionController
                         $this->_repository->updateDatasetPermission($id, $requestUserId, $requestAccessLevel, 1);
                     }
 
-                    $this->flashMessenger()->addMessage('Approved request: '.$requestUser.' ('.$accessLevelLabel.' access)');
-                    return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
-
-                    // TODO - Send email.
-
-                    // TODO - Update access request table
-
-                }
-                else {
-                    // REJECT logic
-                    // Email requester to inform them of the decision
-                    // BUILD EMAIL BODY FOR REJECT MESSAGE
-                    $body = "Your request for [xxxxx] access to [xxxx] dataset was rejected.\r\n\r\n";
+                    $body = "Your request for ".$accessLevelLabel." access to the SPICE dataset '".$dataset->title."' was approved.\r\n\r\n";
+                    $body = $body . "Response:\r\n";
+                    $body = $body . $description . "\r\n";
 
                     $body = $body . "\r\n";
 
@@ -409,13 +389,46 @@ class DatasetController extends AbstractActionController
                     $fromEmail = $this->config['email']['from-email'];
                     $fromLabel = $this->config['email']['from-label'];
                     $mail->setFrom($fromEmail, $fromLabel);
-                    $mail->addTo('jason.carvalho@open.ac.uk', 'Jason Carvalho'); // FIXME - needs to be the requester here
-                    $mail->setSubject('Access to dataset');
+                    $mail->addTo($requestUser, $requestUser);
+                    $mail->setSubject('Access to SPICE dataset approved');
+
+                    $transport = new Mail\Transport\Sendmail();
+                    $transport->send($mail);
+
+                    $this->_stream_repository->approveAccessRequest($arId,$description);
+
+                    $this->flashMessenger()->addMessage('Approved request: '.$requestUser.' ('.$accessLevelLabel.' access)');
+                    return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
+
+                }
+                else {
+                    // REJECT logic
+                    // Email requester to inform them of the decision
+                    // BUILD EMAIL BODY FOR REJECT MESSAGE
+                    $body = "Your request for ".$accessLevelLabel." access to the SPICE dataset '".$dataset->title."' was rejected.\r\n\r\n";
+                    $body = $body . "Response:\r\n";
+                    $body = $body . $description . "\r\n";
+
+                    $body = $body . "\r\n";
+
+                    // UPDATE REQUESTS DATASET
+                    //$this->_stream_repository->createAccessRequest ($dataset->uuid, $this->identity(), $accessLevelCode, $data['description']);
+
+                    // SEND EMAIL TO REQUESTER
+                    $mail = new Mail\Message();
+                    $mail->setBody($body);
+                    $fromEmail = $this->config['email']['from-email'];
+                    $fromLabel = $this->config['email']['from-label'];
+                    $mail->setFrom($fromEmail, $fromLabel);
+                    $mail->addTo($requestUser, $requestUser); // FIXME - needs to be the requester here
+                    $mail->setSubject('Access to SPICE dataset');
 
                     $transport = new Mail\Transport\Sendmail();
                     $transport->send($mail);
 
                     // Update access request table
+                    $this->_stream_repository->rejectAccessRequest($arId,$description);
+
                     $this->flashMessenger()->addMessage('Rejected request: '.$requestUser.' ('.$accessLevelLabel.' access)');
                     return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
                 }
@@ -428,7 +441,8 @@ class DatasetController extends AbstractActionController
                     'features' => $this->datasetsFeatureManager()->getFeatures($id),
                     'user_id' => $user_id,
                     'requestUser' => $requestUser,
-                    'requestAccessLevel' => $requestAccessLevel
+                    'requestAccessLevel' => $requestAccessLevel,
+                    'arId' => $arId,
                 ]);
             }
         }
@@ -723,7 +737,6 @@ class DatasetController extends AbstractActionController
             $form = new Form\DatasetForm($this->_repository);
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
-                //print_r($data);
                 $form->setData($data);
                 if($form->isValid()){
                     // Get User Id
@@ -932,7 +945,6 @@ class DatasetController extends AbstractActionController
             $form = new Form\GeospatialForm($this->_repository);
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
-                //print_r($data);
                 $form->setData($data);
                 if($form->isValid()){
                     // Write data

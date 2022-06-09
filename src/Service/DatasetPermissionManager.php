@@ -17,16 +17,15 @@ class DatasetPermissionManager
     public function hasCustomAccess($dataset, $userID){
         $datasetID = $dataset->id;
         $roleID = $userID;
-        echo("DATASET".$datasetID);
-        echo("USER".$userID);
+        //echo("DATASET".$datasetID);
+        //echo("USER".$userID);
         $permissions = $this->_repository->findDatasetRolePermission($datasetID,$roleID);
-        print_r($permissions);
         if (!$permissions) {
-            echo("RETURNING FALSE");
+            //echo("RETURNING FALSE");
             return false;
         }
         else {
-            echo("RETURNING TRUE");
+            //echo("RETURNING TRUE");
             return true;
         }
     }

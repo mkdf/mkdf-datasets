@@ -16,7 +16,8 @@
             <?php
                 $query = [
                     'user' => $requestUser,
-                    'accessLevel' => $requestAccessLevel
+                    'accessLevel' => $requestAccessLevel,
+                    'arId' => $arId,
                 ];
                 $formAction = $this->url( 'dataset', ['action' => 'access-request-respond', 'id' => $dataset->id], ['query' => $query]  );
             ?>
@@ -27,7 +28,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="decision" id="decisionAccept" value="APPROVE" checked>
                         <label class="form-check-label" for="decisionAccept">
-                            Approve
+                            Accept
                         </label>
                     </div>
                     <div class="form-check">

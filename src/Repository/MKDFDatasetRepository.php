@@ -148,6 +148,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
                 ' AND licence_id = '.$this->fp('licence_id'),
             'insertDatasetLicence' => 'INSERT INTO dataset__licence (dataset_id, licence_id) VALUES ('.$this->fp('dataset_id').', '.$this->fp('licence_id').')',
             'deleteDatasetLicence' => 'DELETE FROM dataset__licence WHERE id = '.$this->fp('id'),
+            'datasetOwnerDetails' => 'SELECT u.id, u.email, u.full_name FROM user u, dataset d WHERE u.id = d.user_id AND d.id = '.$this->fp('dataset_id'),
         ];
     }
 
@@ -273,6 +274,19 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         return $dataset;
     }
 
+    public function getDatasetOwner($id) {
+        $parameters = [
+            'dataset_id' => $id
+        ];
+        $statement = $this->_adapter->createStatement($this->getQuery('datasetOwnerDetails'));
+        $result    = $statement->execute($parameters);
+        $currentResult = null;
+        if ($result instanceof ResultInterface && $result->isQueryResult()) {
+            $currentResult = $result->current();
+        }
+        return $currentResult;
+    }
+
     public function findDatasetTypes() {
         $datasetTypes = [];
         $parameters = [];
@@ -317,7 +331,7 @@ class MKDFDatasetRepository implements MKDFDatasetRepositoryInterface
         $result    = $statement->execute($parameters);
         if ($result instanceof ResultInterface && $result->isQueryResult()) {
             $permissions = $result->current();
-            print_r($permissions);
+            //print_r($permissions);
         }
         return $permissions;
     }
