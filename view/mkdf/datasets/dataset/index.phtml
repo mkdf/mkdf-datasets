@@ -1,7 +1,11 @@
 <h1>Datasets</h1>
+
+<?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+
 <?php if(@$actions): ?>
 <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 <?php endif; ?>
+
 <?php
     $myDataset = false;
 ?>

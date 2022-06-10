@@ -1,0 +1,58 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Respond to dataset access request</h2>
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+
+            <p>
+                <strong>User: </strong><?= $requestUser; ?><br />
+                <strong>Access level requested: </strong><?= $requestAccessLevelLabel; ?>
+            </p>
+
+            <?php
+                $query = [
+                    'user' => $requestUser,
+                    'accessLevel' => $requestAccessLevel,
+                    'arId' => $arId,
+                ];
+                $formAction = $this->url( 'dataset', ['action' => 'access-request-respond', 'id' => $dataset->id], ['query' => $query]  );
+            ?>
+
+            <form method="POST" action="<?= $formAction; ?>">
+                <div class="form-group">
+                    <label for="decision">Please approve or reject the access request</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="decision" id="decisionAccept" value="APPROVE" checked>
+                        <label class="form-check-label" for="decisionAccept">
+                            Accept
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="decision" id="decisionReject" value="REJECT">
+                        <label class="form-check-label" for="decisionReject">
+                            Reject
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">
+                        Please provides notes on your decision here, these will be emailed along with your decision to the user
+                        requesting access.
+                    </label>
+                    <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                </div>
+
+
+                <div class="form-group">
+                    <button class="btn btn-primary" name="submit"><i class="fas fa-reply"></i> Respond</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+</div>

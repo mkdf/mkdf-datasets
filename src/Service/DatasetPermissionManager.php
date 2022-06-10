@@ -14,6 +14,22 @@ class DatasetPermissionManager
         $this->_repository = $repository;
     }
 
+    public function hasCustomAccess($dataset, $userID){
+        $datasetID = $dataset->id;
+        $roleID = $userID;
+        //echo("DATASET".$datasetID);
+        //echo("USER".$userID);
+        $permissions = $this->_repository->findDatasetRolePermission($datasetID,$roleID);
+        if (!$permissions) {
+            //echo("RETURNING FALSE");
+            return false;
+        }
+        else {
+            //echo("RETURNING TRUE");
+            return true;
+        }
+    }
+
     public function canView($dataset, $userID) {
         $datasetID = $dataset->id;
         if ($userID == -1){ //not logged in (anonymous)

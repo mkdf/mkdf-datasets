@@ -33,14 +33,39 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
     return $html;
 }
 ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-view', [] ) ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-read', [] ) ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-write', [] ) ?>
+<?= $this->partial('mkdf/datasets/partial/help-access-manage', [] ) ?>
+
 <table class="table table-bordered">
     <tr class="table-active">
         <th>User/Role</th>
-        <th>View</th>
-        <th>Read</th>
-        <th>Write</th>
-        <th>Delete</th>
-        <th>Manage</th>
+        <th>
+            View
+            <a href="#" data-toggle="modal" data-target="#viewHelpModal">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </th>
+        <th>
+            Read
+            <a href="#" data-toggle="modal" data-target="#readHelpModal">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </th>
+        <th>
+            Write
+            <a href="#" data-toggle="modal" data-target="#writeHelpModal">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </th>
+        <!--<th>Delete</th>-->
+        <th>
+            Manage
+            <a href="#" data-toggle="modal" data-target="#manageHelpModal">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </th>
         <th></th>
     </tr>
 
@@ -67,7 +92,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
-                print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                //print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
                 print ("<td>".button($this,true,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 print ("<td></td>");
                 break;
@@ -75,7 +100,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
                 print ("<td>".button($this,$permission->r,true, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,$permission->w,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
-                print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                //print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
                 print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 print ("<td></td>");
                 break;
@@ -83,7 +108,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
                 print ("<td>".button($this,$permission->r,false, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,$permission->w,false, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
-                print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                //print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
                 print ("<td>".button($this,$permission->g,false, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 print ("<td></td>");
                 break;
@@ -92,7 +117,7 @@ function button($context, $permEnabled, $buttonEnabled, $datasetID, $role_id, $p
                 print ("<td>".button($this,$permission->v,true, $permission->dataset_id, $permission->role_id, 'v')."</td>"); //view
                 print ("<td>".button($this,$permission->r,true, $permission->dataset_id, $permission->role_id, 'r')."</td>"); //read
                 print ("<td>".button($this,$permission->w,true, $permission->dataset_id, $permission->role_id, 'w')."</td>"); //write
-                print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
+                //print ("<td>".button($this,$permission->d,false, $permission->dataset_id, $permission->role_id, 'd')."</td>"); //delete
                 print ("<td>".button($this,$permission->g,true, $permission->dataset_id, $permission->role_id, 'g')."</td>"); //admin
                 $url = $this->url( 'dataset', ['action' => 'permissionsDelete', 'id' => $permission->dataset_id], [query => ['role_id' => $permission->role_id]]  );
                 print ("<td><a class='btn btn-sm btn-danger' href='".$url."'><i class='fas fa-trash-alt'></i></a></td>");

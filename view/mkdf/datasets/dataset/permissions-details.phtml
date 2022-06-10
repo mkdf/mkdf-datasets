@@ -6,8 +6,12 @@
         </div>
         <div class="col-md-9">
             <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
-            <h2>Access control</h2>
+            <h2>Access control management</h2>
             <?= $this->partial('mkdf/datasets/partial/dataset-permissions', ['permissions' => $permissions] ) ?>
+            <hr class="mb-4 mt-4" />
+            <h2>Access requests</h2>
+            <em>Requests for access from other users</em>
+            <?= $this->partial('mkdf/datasets/partial/dataset-access-requests', ['dataset' => $dataset, 'keys' => $keys, 'accessRequests' => $accessRequests, 'user_id' => $user_id] ) ?>
             <hr class="mb-4 mt-4" />
             <h2>Keys registered to this dataset</h2>
             <em>Please manage your own keys on this dataset via the API tab</em>

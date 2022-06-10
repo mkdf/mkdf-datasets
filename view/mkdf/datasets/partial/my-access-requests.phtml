@@ -1,0 +1,71 @@
+<?php
+function getAccessLabel($code){
+    $label = '';
+    switch ($code) {
+        case 'v':
+            $label = 'View';
+            break;
+        case 'r':
+            $label = 'Read';
+            break;
+        case 'w':
+            $label = 'Write';
+            break;
+        case 'a':
+            $label = 'Read/Write';
+            break;
+        case 'g':
+            $label = 'Manage';
+            break;
+        default:
+            $label = 'unknown';
+    }
+    return $label;
+}
+
+function getStatusClass($status){
+    $statusClass = '';
+    switch ($status) {
+        case 'pending':
+            $statusClass = 'bg-warning opacity-30';
+            break;
+        case 'rejected':
+            $statusClass = 'bg-danger text-white opacity-30';
+            break;
+        case 'accepted':
+            $statusClass = 'bg-success text-white opacity-30';
+            break;
+        default:
+            $statusClass = '';
+    }
+    return $statusClass;
+
+}
+?>
+<table class="table table-bordered">
+    <tr class="table-active">
+        <!--<th>User</th>-->
+        <th>Details</th>
+        <th>Access</th>
+        <th>Status</th>
+    </tr>
+    <?php foreach($accessRequests as $arItem): ?>
+        <?php
+        $label = getAccessLabel($arItem->accessLevel);
+        $statusClass = getStatusClass($arItem->status);
+        ?>
+        <tr>
+            <!--<td><?= $arItem->user; ?></td>-->
+            <td>
+                <em><strong>Request:</strong></em><br />
+                <?= $arItem->request; ?><br />
+                <?php if ($arItem->response): ?>
+                    <em><strong>Response:</strong></em><br />
+                    <?= $arItem->response; ?><br />
+                <?php endif; ?>
+            </td>
+            <td><?= $label; ?></td>
+            <td class="<?= $statusClass; ?>"><em><?= $arItem->status; ?></em></td>
+        </tr>
+    <?php endforeach; ?>
+</table>
