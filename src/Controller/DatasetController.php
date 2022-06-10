@@ -260,7 +260,6 @@ class DatasetController extends AbstractActionController
             ]);
         }
         else {
-            //$this->flashMessenger()->addMessage('Unauthorised to view dataset permissions.');
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
         }
     }
@@ -330,7 +329,6 @@ class DatasetController extends AbstractActionController
             $this->flashMessenger()->addMessage('Error: Unable to make dataset access request, missing form data.');
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-request', 'id' => $id]);
         }
-
     }
 
     public function accessRequestRespondAction () {
@@ -452,7 +450,7 @@ class DatasetController extends AbstractActionController
                     return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
                 }
             }
-            else { // Not POST
+            else {
                 // Not a POST request, display the request response form.
                 return new ViewModel([
                     'messages' => $messages,
@@ -508,7 +506,6 @@ class DatasetController extends AbstractActionController
             ]);
         }
         else {
-            //$this->flashMessenger()->addMessage('Unauthorised to view dataset permissions.');
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-request', 'id' => $id]);
         }
     }
