@@ -23,6 +23,11 @@ use Zend\Session\Container;
 use Zend\Paginator\Adapter;
 use Zend\Paginator\Paginator;
 use Zend\Mail;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
+use Zend\Mail\Transport\Sendmail as SendmailTransport;
+use Zend\Mail\Transport\SmtpOptions;
+use Zend\Mime\Message as MimeMessage;
+use Zend\Mime\Part as MimePart;
 
 class DatasetController extends AbstractActionController
 {
@@ -31,10 +36,12 @@ class DatasetController extends AbstractActionController
     private $_keys_repository;
     private $_stream_repository;
     private $_permissionManager;
+    private $viewRenderer;
 
-    public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, MKDFStreamRepositoryInterface $stream_repository, array $config, DatasetPermissionManager $permissionManager)
+    public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, MKDFStreamRepositoryInterface $stream_repository, array $config, DatasetPermissionManager $permissionManager, $viewRenderer)
     {
         $this->config = $config;
+        $this->viewRenderer = $viewRenderer;
         $this->_repository = $repository;
         $this->_keys_repository = $keysRepository;
         $this->_stream_repository = $stream_repository;
@@ -47,6 +54,30 @@ class DatasetController extends AbstractActionController
             array_push($result, $dataset->getProperties());
         }
         return $result;
+    }
+
+    private function _sendEmail ($subject, $bodyHTML, $from, $fromLabel, $to, $toLabel) {
+        // Send an email to user.
+
+        $html = new MimePart($bodyHTML);
+        $html->type = "text/html";
+
+        $body = new MimeMessage();
+        $body->addPart($html);
+
+        $mail = new Mail\Message();
+        $mail->setEncoding('UTF-8');
+        $mail->setBody($body);
+        $mail->setFrom($from, $fromLabel);
+        $mail->addTo($to, $toLabel);
+        $mail->setSubject($subject);
+
+        // Setup SMTP/Sendmail transport
+        //$transport = new SmtpTransport();
+        //$options   = new SmtpOptions($this->config['smtp']);
+        //$transport->setOptions($options);
+        $transport = new SendmailTransport();
+        $transport->send($mail);
     }
 
     public function indexAction()
@@ -274,28 +305,24 @@ class DatasetController extends AbstractActionController
             }
 
             // BUILD EMAIL REQUEST BODY
-            $body = "A user requested access to a SPICE Linked Data Hub dataset that you manage.\r\n\r\n";
-            $body = $body . "Linked Data Hub user: ".$this->identity()."\r\n";
-            $body = $body . "Dataset title: ".$dataset->title."\r\n";
-            $body = $body . "Dataset uuid: ".$dataset->uuid."\r\n";
-            $body = $body . "Access level requested: ".$accessLevelLabel."\r\n";
-            $body = $body . "Description of request: ".$data['description']."\r\n\r\n";
-            $body = $body . "Please visit the access control panel for your dataset to manage and respond to this request:\r\n";
-            //$body = $body . $accessControlLink;
-            $body = $body . "\r\n";
+            $bodyHtml = $this->viewRenderer->render(
+                'mkdf/datasets/email/access-request',
+                [
+                    'datasetId'         => $id,
+                    'user'              => $this->identity(),
+                    'datasetTitle'      => $dataset->title,
+                    'datasetUuid'       => $dataset->uuid,
+                    'accessLevelLabel'  => $accessLevelLabel,
+                    'requestDescription'=> $data['description'],
+                ]);
+            $subject = "Linked Data Hub access request";
 
             // ADD REQUEST TO REQUESTS DATASET
             $this->_stream_repository->createAccessRequest ($dataset->uuid, $this->identity(), $accessLevelCode, $data['description']);
 
             // SEND EMAIL TO DATASET OWNER/MANAGER(S)
-            $mail = new Mail\Message();
-            $mail->setBody($body);
-            $mail->setFrom($fromEmail, $fromLabel);
-            $mail->addTo($toEmail, $toLabel);
-            $mail->setSubject('A user requested access to a SPICE dataset');
+            $this->_sendEmail($subject, $bodyHtml, $fromEmail, $fromLabel, $toEmail, $toLabel);
 
-            $transport = new Mail\Transport\Sendmail();
-            $transport->send($mail);
             $this->flashMessenger()->addMessage('An email has been sent to the dataset manager(s) to inform them of your request.');
             return $this->redirect()->toRoute('dataset', ['action'=>'permissions-request', 'id' => $id]);
         }
@@ -332,28 +359,30 @@ class DatasetController extends AbstractActionController
 
         if ($can_edit) {
 
+            switch ($requestAccessLevel) {
+                case 'a':
+                    $accessLevelLabel = 'Read/Write';
+                    break;
+                case 'r':
+                    $accessLevelLabel = 'Read';
+                    break;
+                case 'w':
+                    $accessLevelLabel = 'Write';
+                    break;
+                case 'g':
+                    $accessLevelLabel = 'Manage';
+                    break;
+                default:
+                    $accessLevelLabel = 'unknown';
+            }
+
             if($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
 
                 $description = $data['description'];
                 $decisionAccept = $data['decision'];
 
-                switch ($requestAccessLevel) {
-                    case 'a':
-                        $accessLevelLabel = 'read/write';
-                        break;
-                    case 'r':
-                        $accessLevelLabel = 'read';
-                        break;
-                    case 'w':
-                        $accessLevelLabel = 'write';
-                        break;
-                    case 'g':
-                        $accessLevelLabel = 'manage';
-                        break;
-                    default:
-                        $accessLevelLabel = 'unknown';
-                }
+
 
                 if ($decisionAccept == "APPROVE") {
                     // APPROVE logic
@@ -374,60 +403,50 @@ class DatasetController extends AbstractActionController
                         $this->_repository->updateDatasetPermission($id, $requestUserId, $requestAccessLevel, 1);
                     }
 
-                    $body = "Your request for ".$accessLevelLabel." access to the SPICE dataset '".$dataset->title."' was approved.\r\n\r\n";
-                    $body = $body . "Response:\r\n";
-                    $body = $body . $description . "\r\n";
+                    // BUILD EMAIL  BODY
+                    $bodyHtml = $this->viewRenderer->render(
+                        'mkdf/datasets/email/access-request-accepted',
+                        [
+                            'datasetId'         => $id,
+                            'datasetTitle'      => $dataset->title,
+                            'datasetUuid'       => $dataset->uuid,
+                            'accessLevelLabel'  => $accessLevelLabel,
+                            'responseDescription'=> $description,
+                        ]);
+                    $subject = "Linked Data Hub access request approved";
 
-                    $body = $body . "\r\n";
-
-                    // UPDATE REQUESTS DATASET
-                    //$this->_stream_repository->createAccessRequest ($dataset->uuid, $this->identity(), $accessLevelCode, $data['description']);
+                    // Process the approval
+                    $this->_stream_repository->approveAccessRequest($arId,$description);
 
                     // SEND EMAIL TO REQUESTER
-                    $mail = new Mail\Message();
-                    $mail->setBody($body);
                     $fromEmail = $this->config['email']['from-email'];
                     $fromLabel = $this->config['email']['from-label'];
-                    $mail->setFrom($fromEmail, $fromLabel);
-                    $mail->addTo($requestUser, $requestUser);
-                    $mail->setSubject('Access to SPICE dataset approved');
-
-                    $transport = new Mail\Transport\Sendmail();
-                    $transport->send($mail);
-
-                    $this->_stream_repository->approveAccessRequest($arId,$description);
+                    $this->_sendEmail($subject, $bodyHtml, $fromEmail, $fromLabel, $requestUser, $requestUser);
 
                     $this->flashMessenger()->addMessage('Approved request: '.$requestUser.' ('.$accessLevelLabel.' access)');
                     return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
-
                 }
                 else {
                     // REJECT logic
-                    // Email requester to inform them of the decision
-                    // BUILD EMAIL BODY FOR REJECT MESSAGE
-                    $body = "Your request for ".$accessLevelLabel." access to the SPICE dataset '".$dataset->title."' was rejected.\r\n\r\n";
-                    $body = $body . "Response:\r\n";
-                    $body = $body . $description . "\r\n";
-
-                    $body = $body . "\r\n";
-
-                    // UPDATE REQUESTS DATASET
-                    //$this->_stream_repository->createAccessRequest ($dataset->uuid, $this->identity(), $accessLevelCode, $data['description']);
-
-                    // SEND EMAIL TO REQUESTER
-                    $mail = new Mail\Message();
-                    $mail->setBody($body);
-                    $fromEmail = $this->config['email']['from-email'];
-                    $fromLabel = $this->config['email']['from-label'];
-                    $mail->setFrom($fromEmail, $fromLabel);
-                    $mail->addTo($requestUser, $requestUser); // FIXME - needs to be the requester here
-                    $mail->setSubject('Access to SPICE dataset');
-
-                    $transport = new Mail\Transport\Sendmail();
-                    $transport->send($mail);
+                    // BUILD EMAIL  BODY
+                    $bodyHtml = $this->viewRenderer->render(
+                        'mkdf/datasets/email/access-request-rejected',
+                        [
+                            'datasetId'         => $id,
+                            'datasetTitle'      => $dataset->title,
+                            'datasetUuid'       => $dataset->uuid,
+                            'accessLevelLabel'  => $accessLevelLabel,
+                            'responseDescription'=> $description,
+                        ]);
+                    $subject = "Linked Data Hub access request rejected";
 
                     // Update access request table
                     $this->_stream_repository->rejectAccessRequest($arId,$description);
+
+                    // SEND EMAIL TO REQUESTER
+                    $fromEmail = $this->config['email']['from-email'];
+                    $fromLabel = $this->config['email']['from-label'];
+                    $this->_sendEmail($subject, $bodyHtml, $fromEmail, $fromLabel, $requestUser, $requestUser);
 
                     $this->flashMessenger()->addMessage('Rejected request: '.$requestUser.' ('.$accessLevelLabel.' access)');
                     return $this->redirect()->toRoute('dataset', ['action'=>'permissions-details', 'id' => $id]);
@@ -442,6 +461,7 @@ class DatasetController extends AbstractActionController
                     'user_id' => $user_id,
                     'requestUser' => $requestUser,
                     'requestAccessLevel' => $requestAccessLevel,
+                    'requestAccessLevelLabel' => $accessLevelLabel,
                     'arId' => $arId,
                 ]);
             }
