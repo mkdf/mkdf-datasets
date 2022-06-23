@@ -981,7 +981,8 @@ class DatasetController extends AbstractActionController
                     'form' => $form,
                     'messages' => $messages,
                     'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                    'dataset_id' => $id
+                    'dataset_id' => $id,
+                    'dataset' => $dataset
                 ]
             );
         }

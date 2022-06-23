@@ -1,4 +1,4 @@
-<h1>Edit dataset location</h1>
+<h1><?= $dataset->title ?></h1>
 <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
 <div class="container">
     <div class="row">
@@ -6,6 +6,7 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset_id] ) ?>
         </div>
         <div class="col-md-9">
+            <h2>Location - edit</h2>
             <p>
                 <em>Enter the dataset coordinates below or click a location on the map. The location can be fine-tuned by
                 zooming in on the map and dragging the map pin.</em>

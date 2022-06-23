@@ -43,15 +43,17 @@ $myPermissions = getAccessLevelsFromPermissions($permissions,$user_id);
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+            <h2>Access control</h2>
 
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+            <hr class="mb-4 mt-4" />
             <div class="row">
                 <div class="col-md-4">
-                    <h2>My access</h2>
+                    <h4>My access</h4>
                     <?= $this->partial('mkdf/datasets/partial/my-dataset-access', ['dataset' => $dataset, 'permissions' => $permissions, 'accessRequests' => $accessRequests, 'user_id' => $user_id, 'myPermissions' => $myPermissions] ) ?>
                 </div>
                 <div class="col-md-8">
-                    <h2>Request additional access</h2>
+                    <h4>Request additional access</h4>
                     <?= $this->partial('mkdf/datasets/partial/request-access', ['dataset' => $dataset, 'keys' => $keys, 'accessRequests' => $accessRequests, 'user_id' => $user_id, 'myPermissions' => $myPermissions] ) ?>
                 </div>
             </div>
@@ -59,7 +61,7 @@ $myPermissions = getAccessLevelsFromPermissions($permissions,$user_id);
 
             <hr class="mb-4 mt-4" />
 
-            <h2>My access requests</h2>
+            <h4>My access requests</h4>
             <?= $this->partial('mkdf/datasets/partial/my-access-requests', ['dataset' => $dataset, 'keys' => $keys, 'accessRequests' => $accessRequests, 'user_id' => $user_id] ) ?>
         </div>
     </div>
