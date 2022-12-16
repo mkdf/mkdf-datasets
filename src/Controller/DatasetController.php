@@ -1180,4 +1180,15 @@ class DatasetController extends AbstractActionController
             'licence'   => $licence
         ]);
     }
+
+    public function notificationsDetailsAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $format = $this->params()->fromQuery('f', "");
+        $dataset = $this->_repository->findDataset($id);
+        $user_id = $this->currentUser()->getId();
+        return new ViewModel([
+            'features' => $this->datasetsFeatureManager()->getFeatures($id),
+            'dataset' => $dataset
+        ]);
+    }
 }

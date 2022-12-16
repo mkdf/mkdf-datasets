@@ -1,0 +1,90 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+
+    <!-- Modals -->
+    <div class="modal fade" id="notificationDetailModal" tabindex="-1" aria-labelledby="notificationDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationDetailModalLabel">Notification details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span id="notificationDetailModalContent">
+                        <!--Modal content here-->
+                        Here are the details of the notification
+                    </span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ******************* -->
+
+
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Notifications</h2>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+            <h6>Filter notifications</h6>
+            <select class="custom-select">
+                <option selected>All notifications</option>
+                <option value="1">Privacy violations</option>
+                <option value="2">Hate speech detection</option>
+            </select>
+            <hr />
+            <table class="table table-bordered table-striped table-sm">
+                <tr class="table-active">
+                    <th scope="col">Date</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Document</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                <tr>
+                    <td>14/12/2022 11:06</td>
+                    <td>PRIVACY-VIOLATION</td>
+                    <td>62455daa0352860b9d1dfb2b</td>
+                    <td class="bg-danger">ALERT</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
+                            <i class="fas fa-search"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>12/12/2022 14:03</td>
+                    <td>PRIVACY-VIOLATION</td>
+                    <td>638e0c3bab57af100857a486</td>
+                    <td class="bg-danger">ALERT</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
+                            <i class="fas fa-search"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>10/12/2022 15:46</td>
+                    <td>HATE-SPEECH-DETECTION</td>
+                    <td>628b44ed069beb060a75c888</td>
+                    <td class="bg-success">DISMISSED</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
+                            <i class="fas fa-search"></i>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+

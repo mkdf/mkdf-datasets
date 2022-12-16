@@ -24,6 +24,7 @@ return [
             DatasetsFeature\GeospatialFeature::class => InvokableFactory::class,
             DatasetsFeature\OwnershipFeature::class => InvokableFactory::class,
             DatasetsFeature\AccountDatasetsFeature::class => InvokableFactory::class,
+            DatasetsFeature\NotificationsFeature::class => InvokableFactory::class,
             Repository\MKDFDatasetRepository::class => Repository\Factory\MKFDFDatasetRepositoryFactory::class,
             Service\DatasetsFeatureManager::class => Service\Factory\DatasetsFeatureManagerFactory::class,
             Service\DatasetPermissionManager::class => Service\Factory\DatasetPermissionManagerFactory::class

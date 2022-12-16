@@ -27,7 +27,7 @@ class OwnershipFeature implements DatasetsFeatureInterface
         return true;
     }
     public function getLabel(){
-        return '<i class="fas fa-copyright"></i> Ownership and licensing';
+        return '<i class="fas fa-copyright"></i> Ownership';
     }
     public function isActive(){
         return $this->active;
