@@ -1186,9 +1186,28 @@ class DatasetController extends AbstractActionController
         $format = $this->params()->fromQuery('f', "");
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
-        return new ViewModel([
-            'features' => $this->datasetsFeatureManager()->getFeatures($id),
-            'dataset' => $dataset
-        ]);
+
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+
+        if ($can_edit) {
+            $notificationsDataset = $this->config['notifications']['notifications-dataset'];
+            $notificationsKey = $this->config['notifications']['notifications-key'];
+            $query = [
+                'dataset' => $dataset->uuid
+            ];
+            $queryJSON = json_encode($query);
+            $response = json_decode($this->_stream_repository->getDocuments ($notificationsDataset,999, null, $queryJSON), True);
+
+            return new ViewModel([
+                'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                'dataset' => $dataset,
+                'notifications' => $response,
+            ]);
+        }
+        else {
+            $this->flashMessenger()->addMessage('Unauthorised to view dataset notifications.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id'=>$id]);
+        }
+
     }
 }

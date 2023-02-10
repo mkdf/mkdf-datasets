@@ -101,6 +101,7 @@
     <!-- ******************* -->
 
 
+
     <div class="row">
         <div class="col-md-3">
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
@@ -109,12 +110,15 @@
             <h2>Notifications</h2>
             <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
             <h6>Filter notifications</h6>
-            <select class="custom-select">
+            <select class="custom-select" disabled>
                 <option selected>All notifications</option>
                 <option value="1">Privacy violations</option>
-                <option value="2">Hate speech detection</option>
+                <!--<option value="2">Hate speech detection</option>-->
             </select>
             <hr />
+
+            <?php if(count($notifications) > 0): ?>
+
             <table class="table table-bordered table-striped table-sm">
                 <tr class="table-active">
                     <th scope="col">Date</th>
@@ -123,40 +127,25 @@
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
+
                 <tr>
-                    <td>14/12/2022 11:06</td>
-                    <td>PRIVACY-VIOLATION</td>
-                    <td>62455daa0352860b9d1dfb2b</td>
-                    <td class="bg-danger">ALERT</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
-                            <i class="fas fa-search"></i>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>12/12/2022 14:03</td>
-                    <td>PRIVACY-VIOLATION</td>
-                    <td>638e0c3bab57af100857a486</td>
-                    <td class="bg-danger">ALERT</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
-                            <i class="fas fa-search"></i>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>10/12/2022 15:46</td>
-                    <td>HATE-SPEECH-DETECTION</td>
-                    <td>628b44ed069beb060a75c888</td>
-                    <td class="bg-success">DISMISSED</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
-                            <i class="fas fa-search"></i>
-                        </a>
-                    </td>
+                    <?php foreach($notifications as $notification): ?>
+                        <td><?= $notification['Date'] ?></td>
+                        <td><?= $notification['job-type'] ?></td>
+                        <td><?= $notification['Document ID'] ?></td>
+                        <td><?= $notification['Status'] ?></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
+                                <i class="fas fa-search"></i>
+                            </a>
+                        </td>
+                    <?php endforeach; ?>
                 </tr>
             </table>
+
+            <?php else: ?>
+            <em>No notifications to display.</em>
+            <?php endif; ?>
 
         </div>
     </div>
