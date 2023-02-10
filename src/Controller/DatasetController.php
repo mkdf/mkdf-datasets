@@ -36,7 +36,7 @@ class DatasetController extends AbstractActionController
     private $_keys_repository;
     private $_stream_repository;
     private $_permissionManager;
-    private $viewRenderer;
+
 
     public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, MKDFStreamRepositoryInterface $stream_repository, array $config, DatasetPermissionManager $permissionManager, $viewRenderer)
     {
@@ -1179,5 +1179,35 @@ class DatasetController extends AbstractActionController
             'licenceId' => $id,
             'licence'   => $licence
         ]);
+    }
+
+    public function notificationsDetailsAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $format = $this->params()->fromQuery('f', "");
+        $dataset = $this->_repository->findDataset($id);
+        $user_id = $this->currentUser()->getId();
+
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+
+        if ($can_edit) {
+            $notificationsDataset = $this->config['notifications']['notifications-dataset'];
+            $notificationsKey = $this->config['notifications']['notifications-key'];
+            $query = [
+                'dataset' => $dataset->uuid
+            ];
+            $queryJSON = json_encode($query);
+            $response = json_decode($this->_stream_repository->getDocuments ($notificationsDataset,999, null, $queryJSON), True);
+
+            return new ViewModel([
+                'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                'dataset' => $dataset,
+                'notifications' => $response,
+            ]);
+        }
+        else {
+            $this->flashMessenger()->addMessage('Unauthorised to view dataset notifications.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'details', 'id'=>$id]);
+        }
+
     }
 }

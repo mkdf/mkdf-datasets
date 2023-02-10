@@ -1,0 +1,154 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+
+    <!-- Modals -->
+    <div class="modal fade" id="notificationDetailModal" tabindex="-1" aria-labelledby="notificationDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationDetailModalLabel">Notification details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span id="notificationDetailModalContent">
+                        <!--Modal content here-->
+
+                        <table class="table table-bordered table-striped table-sm">
+                            <tr>
+                                <td>Type</td>
+                                <td>PRIVACY-VIOLATION</td>
+                            </tr>
+                            <tr>
+                                <td>Date</td>
+                                <td>14/12/2022 11:06</td>
+                            </tr>
+                            <tr>
+                                <td>Document ID</td>
+                                <td>62455daa0352860b9d1dfb2b</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>ALERT</td>
+                            </tr>
+                            <tr>
+                                <td>Severity</td>
+                                <td>EXTREME</td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>Personally identifiable information was detected in this document</td>
+                            </tr>
+                        </table>
+
+                        <hr />
+                        <h6>Fields</h6>
+
+                        <table class="table table-bordered table-striped table-sm">
+                            <tr>
+                                <td>Field name</td>
+                                <td>artwork_thoughts</td>
+                            </tr>
+                            <tr>
+                                <td>Value</td>
+                                <td>This reminds me of where I live in Paris</td>
+                            </tr>
+                            <tr>
+                                <td>PII Type</td>
+                                <td>Location</td>
+                            </tr>
+                            <tr>
+                                <td>PII Description</td>
+                                <td>A geopolitical entity was detected</td>
+                            </tr>
+                            <tr>
+                                <td>Alert score</td>
+                                <td>MEDIUM</td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-bordered table-striped table-sm">
+                            <tr>
+                                <td>Field name</td>
+                                <td>other_comments</td>
+                            </tr>
+                            <tr>
+                                <td>Value</td>
+                                <td>Please contact me at david@hotmail.com for more information</td>
+                            </tr>
+                            <tr>
+                                <td>PII Type</td>
+                                <td>Email</td>
+                            </tr>
+                            <tr>
+                                <td>PII Description</td>
+                                <td>An email address was detected</td>
+                            </tr>
+                            <tr>
+                                <td>Alert score</td>
+                                <td>MEDIUM</td>
+                            </tr>
+                        </table>
+                    </span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ******************* -->
+
+
+
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Notifications</h2>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+            <h6>Filter notifications</h6>
+            <select class="custom-select" disabled>
+                <option selected>All notifications</option>
+                <option value="1">Privacy violations</option>
+                <!--<option value="2">Hate speech detection</option>-->
+            </select>
+            <hr />
+
+            <?php if(count($notifications) > 0): ?>
+
+            <table class="table table-bordered table-striped table-sm">
+                <tr class="table-active">
+                    <th scope="col">Date</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Document</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+                <tr>
+                    <?php foreach($notifications as $notification): ?>
+                        <td><?= $notification['Date'] ?></td>
+                        <td><?= $notification['job-type'] ?></td>
+                        <td><?= $notification['Document ID'] ?></td>
+                        <td><?= $notification['Status'] ?></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
+                                <i class="fas fa-search"></i>
+                            </a>
+                        </td>
+                    <?php endforeach; ?>
+                </tr>
+            </table>
+
+            <?php else: ?>
+            <em>No notifications to display.</em>
+            <?php endif; ?>
+
+        </div>
+    </div>
+
+</div>
+
