@@ -36,7 +36,7 @@ class DatasetController extends AbstractActionController
     private $_keys_repository;
     private $_stream_repository;
     private $_permissionManager;
-    private $viewRenderer;
+
 
     public function __construct(MKDFDatasetRepositoryInterface $repository, MKDFKeysRepositoryInterface $keysRepository, MKDFStreamRepositoryInterface $stream_repository, array $config, DatasetPermissionManager $permissionManager, $viewRenderer)
     {
