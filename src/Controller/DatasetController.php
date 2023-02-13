@@ -1183,7 +1183,7 @@ class DatasetController extends AbstractActionController
 
     public function notificationsDetailsAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
-        $format = $this->params()->fromQuery('f', "");
+        //$format = $this->params()->fromQuery('f', "");
         $dataset = $this->_repository->findDataset($id);
         $user_id = $this->currentUser()->getId();
 
