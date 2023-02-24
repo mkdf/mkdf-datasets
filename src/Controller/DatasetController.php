@@ -1210,4 +1210,44 @@ class DatasetController extends AbstractActionController
         }
 
     }
+
+    public function notificationsUpdateAction() {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_repository->findDataset($id);
+        $notificationsDataset = $this->config['notifications']['notifications-dataset'];
+        $notificationsKey = $this->config['notifications']['notifications-key'];
+        /*
+             * mogodb query:
+             * {"$or":[{"emailed":{"$exists":false}},{"emailed":false}]}
+             */
+        $query = [
+            'dataset' => $dataset->uuid,
+            'job-type' => 'PRIVACY-VIOLATION',
+            '$or' => [
+                [
+                    'emailed' => false
+                ],
+                [
+                    'emailed' => [
+                        '$exists' => false
+                    ]
+                ]
+            ]
+        ];
+        $queryJSON = json_encode($query);
+        //var_dump($queryJSON);
+        $response = json_decode($this->_stream_repository->getDocuments ($notificationsDataset,999, null, $queryJSON), True);
+        foreach ($response as $item) {
+            //Check debug/dev status - are we sending to everyone right now?
+            //Get dataset owner
+            //build email text
+            //send email
+
+        }
+        return new ViewModel([
+            'features' => $this->datasetsFeatureManager()->getFeatures($id),
+            'dataset' => $dataset,
+            'items' => $response,
+        ]);
+    }
 }
