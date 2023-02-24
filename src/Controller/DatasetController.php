@@ -1216,6 +1216,15 @@ class DatasetController extends AbstractActionController
         $dataset = $this->_repository->findDataset($id);
         $notificationsDataset = $this->config['notifications']['notifications-dataset'];
         $notificationsKey = $this->config['notifications']['notifications-key'];
+        $developmentMode = $this->config['notifications']['development'];
+        $devEmails = $this->config['notifications']['development-emails'];
+
+        $ownerDetails = $this->_repository->getDatasetOwner($id);
+        $toEmail = $ownerDetails['email'];
+        $toLabel = $ownerDetails['full_name'];
+        $fromEmail = $this->config['email']['from-email'];
+        $fromLabel = $this->config['email']['from-label'];
+
         /*
              * mogodb query:
              * {"$or":[{"emailed":{"$exists":false}},{"emailed":false}]}
@@ -1239,15 +1248,35 @@ class DatasetController extends AbstractActionController
         $response = json_decode($this->_stream_repository->getDocuments ($notificationsDataset,999, null, $queryJSON), True);
         foreach ($response as $item) {
             //Check debug/dev status - are we sending to everyone right now?
-            //Get dataset owner
+            //Get dataset owner (done above)
             //build email text
-            //send email
+            //send email - $this->_sendEmail ($subject, $bodyHTML, $from, $fromLabel, $to, $toLabel);
+            //mark notification as sent in notification entry and push back to LDH API.
 
+            // Only email if we're not in dev mode or the dataset owners are in the dev email list
+            if (!$developmentMode || in_array($toEmail, $devEmails)) {
+                // BUILD EMAIL REQUEST BODY
+                $bodyHTML = $this->viewRenderer->render(
+                    'mkdf/datasets/email/pii-notification',
+                    [
+                        'datasetId'     => $id,
+                        'datasetTitle'  => $dataset->title,
+                        'datasetUuid'   => $dataset->uuid,
+                        'docId'         => $item['Document ID'],
+                    ]);
+                $subject = "SPICE Linked Data Hub - Content scanner alert";
+                $this->_sendEmail ($subject, $bodyHTML, $fromEmail, $fromLabel, $toEmail, $toLabel);
+                $item['emailed'] = True;
+
+                // push back to LDH with 'emailed' attribute set
+                $this->_stream_repository->updateDocument ($notificationsDataset,json_encode($item), $item['_id']);
+            }
         }
         return new ViewModel([
             'features' => $this->datasetsFeatureManager()->getFeatures($id),
             'dataset' => $dataset,
             'items' => $response,
+            'bodyHtml' => $bodyHTML
         ]);
     }
 }
