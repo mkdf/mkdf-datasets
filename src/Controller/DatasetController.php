@@ -1193,7 +1193,8 @@ class DatasetController extends AbstractActionController
             $notificationsDataset = $this->config['notifications']['notifications-dataset'];
             $notificationsKey = $this->config['notifications']['notifications-key'];
             $query = [
-                'dataset' => $dataset->uuid
+                'dataset' => $dataset->uuid,
+                'job-type' => 'PRIVACY-VIOLATION'
             ];
             $queryJSON = json_encode($query);
             $response = json_decode($this->_stream_repository->getDocuments ($notificationsDataset,999, null, $queryJSON), True);
@@ -1262,7 +1263,7 @@ class DatasetController extends AbstractActionController
                         'datasetId'     => $id,
                         'datasetTitle'  => $dataset->title,
                         'datasetUuid'   => $dataset->uuid,
-                        'docId'         => $item['Document ID'],
+                        'docId'         => $item['document ID'],
                     ]);
                 $subject = "SPICE Linked Data Hub - Content scanner alert";
                 $this->_sendEmail ($subject, $bodyHTML, $fromEmail, $fromLabel, $toEmail, $toLabel);

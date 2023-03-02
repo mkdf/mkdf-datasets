@@ -15,7 +15,8 @@
                     <span id="notificationDetailModalContent">
                         <!--Modal content here-->
 
-                        <table class="table table-bordered table-striped table-sm">
+                        <table class="table table-bordered table-striped table-sm" id="notificationTable">
+                            <tbody>
                             <tr>
                                 <td>Type</td>
                                 <td>PRIVACY-VIOLATION</td>
@@ -40,12 +41,14 @@
                                 <td>Description</td>
                                 <td>Personally identifiable information was detected in this document</td>
                             </tr>
+                            </tbody>
                         </table>
 
                         <hr />
                         <h6>Fields</h6>
 
-                        <table class="table table-bordered table-striped table-sm">
+                        <span id="fieldsSpan">
+                            <table class="table table-bordered table-striped table-sm" id="fieldsTable">
                             <tr>
                                 <td>Field name</td>
                                 <td>artwork_thoughts</td>
@@ -67,29 +70,11 @@
                                 <td>MEDIUM</td>
                             </tr>
                         </table>
+                        </span>
 
-                        <table class="table table-bordered table-striped table-sm">
-                            <tr>
-                                <td>Field name</td>
-                                <td>other_comments</td>
-                            </tr>
-                            <tr>
-                                <td>Value</td>
-                                <td>Please contact me at david@hotmail.com for more information</td>
-                            </tr>
-                            <tr>
-                                <td>PII Type</td>
-                                <td>Email</td>
-                            </tr>
-                            <tr>
-                                <td>PII Description</td>
-                                <td>An email address was detected</td>
-                            </tr>
-                            <tr>
-                                <td>Alert score</td>
-                                <td>MEDIUM</td>
-                            </tr>
-                        </table>
+
+
+
                     </span>
                 </div>
                 <div class="modal-footer">
@@ -118,8 +103,8 @@
             <hr />
 
             <?php if(count($notifications) > 0): ?>
-                <em>Notifications temporarily disabled.</em>
-<!--
+                <!--<em>Notifications temporarily disabled.</em>-->
+
             <table class="table table-bordered table-striped table-sm">
                 <tr class="table-active">
                     <th scope="col">Date</th>
@@ -128,22 +113,21 @@
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
-
+                <?php foreach($notifications as $notification): ?>
                 <tr>
-                    <?php foreach($notifications as $notification): ?>
-                        <td><?= $notification['Date'] ?></td>
+                        <td><?= $notification['modified-by'] ?></td>
                         <td><?= $notification['job-type'] ?></td>
-                        <td><?= $notification['Document ID'] ?></td>
-                        <td><?= $notification['Status'] ?></td>
+                        <td><?= $notification['document ID'] ?></td>
+                        <td><?= $notification['status'] ?></td>
                         <td>
-                            <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal'>
+                            <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal' onclick="populateModal('<?= $notification['_id'] ?>')">
                                 <i class="fas fa-search"></i>
                             </a>
                         </td>
-                    <?php endforeach; ?>
                 </tr>
+                <?php endforeach; ?>
             </table>
--->
+
             <?php else: ?>
             <em>No notifications to display.</em>
             <?php endif; ?>
@@ -152,4 +136,77 @@
     </div>
 
 </div>
+
+<!-- **** JS SCRIPTS **** -->
+
+<script>
+    var notifications = [];
+
+    function populateModal(notificationId) {
+        var noti = notifications[notificationId];
+        $('#notificationTable > tbody').empty();
+        $('#notificationTable > tbody').append('<tr><td>Type</td><td>'+noti['job-type']+'</td></tr>');
+        $('#notificationTable > tbody').append('<tr><td>Notification Date</td><td>'+noti['notificationDate']+'</td></tr>');
+        $('#notificationTable > tbody').append('<tr><td>Document ID</td><td>'+noti['docId']+'</td></tr>');
+        $('#notificationTable > tbody').append('<tr><td>Severity</td><td>'+noti['severity']+'</td></tr>');
+        $('#notificationTable > tbody').append('<tr><td>Description</td><td>'+noti['description']+'</td></tr>');
+
+        $('#fieldsSpan').empty();
+
+        noti['Fields'].forEach(function (item, index) {
+            tableHTML = '<table class="table table-bordered table-striped table-sm"><tbody>';
+            tableHTML += '<tr><td>Field name</td><td>'+item['Field Name']+'</td></tr>';
+            tableHTML += '<tr><td>Field Value</td><td>'+item['Value']+'</td></tr>';
+            tableHTML += '<tr><td>PII Text Detected</td><td>'+item['PII Detected Value']+'</td></tr>';
+            tableHTML += '<tr><td>PII Type</td><td>'+item['PII Type']+'</td></tr>';
+            tableHTML += '<tr><td>PII Description</td><td>'+item['PII Description']+'</td></tr>';
+            console.log(item, index);
+            tableHTML += '</tbody></table>';
+            $('#fieldsSpan').append(tableHTML);
+        });
+
+    }
+
+
+
+    $(document).ready(function(){
+
+        <?php foreach($notifications as $notification): ?>
+        var notificationObject = {};
+        notificationObject['job-type'] = '<?= $notification['job-type'] ?>';
+        notificationObject['notificationDate'] = '<?= $notification['modified-by'] ?>';
+        notificationObject['docId'] = '<?= $notification['document ID'] ?>';
+        notificationObject['severity'] = '<?= $notification['severityScores'] ?>';
+        notificationObject['description'] = '<?= $notification['description'] ?>';
+        notificationObject['Fields'] = [];
+
+            <?php foreach ($notification['Fields'] as $field): ?>
+            var fieldObj = [];
+            fieldObj['Field Name'] = '<?= $field['Field Name'] ?>';
+            fieldObj['Value'] = '<?= $field['Value'] ?>';
+            fieldObj['PII Type'] = '<?= $field['PII Type'] ?>';
+            fieldObj['PII Description'] = '<?= $field['PII Description'] ?>';
+            fieldObj['Alert Score'] = '<?= $field['Alert Score'] ?>';
+            fieldObj['Alert Name'] = '<?= $field['Alert Name'] ?>';
+            <?php
+                if (is_array($field['PII Detected Value'])) {
+                    $detectedValue = implode(",", $field['PII Detected Value']); // convert array to string using comma separator
+                }
+                else {
+                    $detectedValue = $field['PII Detected Value'];
+                }
+            ?>
+            fieldObj['PII Detected Value'] = '<?= $detectedValue ?>';
+
+            notificationObject['Fields'].push(fieldObj);
+            <?php endforeach; ?>
+
+        notifications['<?= $notification['_id'] ?>'] = notificationObject;
+        <?php endforeach; ?>
+
+        console.log(notifications);
+
+
+    });
+</script>
 
