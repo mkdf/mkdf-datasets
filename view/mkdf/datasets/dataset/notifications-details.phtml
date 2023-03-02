@@ -76,7 +76,12 @@
                 </tr>
                 <?php foreach($notifications as $notification): ?>
                 <tr>
-                        <td><?= $notification['modified-by'] ?></td>
+                    <?php
+                        $date = new DateTime();
+                        $date->setTimestamp($notification['modified-by']);
+                        $dateString = $date->format('d/m/Y H:i');
+                    ?>
+                        <td><?= $dateString ?></td>
                         <td><?= $notification['job-type'] ?></td>
                         <td><?= $notification['document ID'] ?></td>
                         <td><?= $notification['status'] ?></td>
@@ -103,11 +108,25 @@
 <script>
     var notifications = [];
 
+    function formatTimestamp (inputDate) {
+        var output = '';
+        day = inputDate.getDate();
+        month = inputDate.getMonth() + 1; // month is zero-indexed :-s
+        year = inputDate.getFullYear();
+        hour = inputDate.getHours();
+        mins = inputDate.getMinutes()
+        output = day+'/'+month+'/'+year+' '+hour+':'+mins;
+        return output;
+    }
+
     function populateModal(notificationId) {
         var noti = notifications[notificationId];
         $('#notificationTable > tbody').empty();
         $('#notificationTable > tbody').append('<tr><td>Type</td><td>'+noti['job-type']+'</td></tr>');
-        $('#notificationTable > tbody').append('<tr><td>Notification Date</td><td>'+noti['notificationDate']+'</td></tr>');
+        const unixTimestamp = noti['notificationDate']; // Unix timestamp in seconds
+        const dateObj = new Date(unixTimestamp * 1000); // Convert to milliseconds
+        const humanDate = formatTimestamp(dateObj);
+        $('#notificationTable > tbody').append('<tr><td>Notification Date</td><td>'+humanDate+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Document ID</td><td>'+noti['docId']+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Severity</td><td>'+noti['severity']+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Description</td><td>'+noti['description']+'</td></tr>');
