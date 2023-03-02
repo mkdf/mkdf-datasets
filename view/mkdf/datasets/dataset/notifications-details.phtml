@@ -21,59 +21,22 @@
                                 <td>Type</td>
                                 <td>PRIVACY-VIOLATION</td>
                             </tr>
-                            <tr>
-                                <td>Date</td>
-                                <td>14/12/2022 11:06</td>
-                            </tr>
-                            <tr>
-                                <td>Document ID</td>
-                                <td>62455daa0352860b9d1dfb2b</td>
-                            </tr>
-                            <tr>
-                                <td>Status</td>
-                                <td>ALERT</td>
-                            </tr>
-                            <tr>
-                                <td>Severity</td>
-                                <td>EXTREME</td>
-                            </tr>
-                            <tr>
-                                <td>Description</td>
-                                <td>Personally identifiable information was detected in this document</td>
-                            </tr>
+
                             </tbody>
                         </table>
 
                         <hr />
-                        <h6>Fields</h6>
+                        <h6>Document Fields</h6>
 
                         <span id="fieldsSpan">
                             <table class="table table-bordered table-striped table-sm" id="fieldsTable">
                             <tr>
                                 <td>Field name</td>
-                                <td>artwork_thoughts</td>
+                                <td>field_name</td>
                             </tr>
-                            <tr>
-                                <td>Value</td>
-                                <td>This reminds me of where I live in Paris</td>
-                            </tr>
-                            <tr>
-                                <td>PII Type</td>
-                                <td>Location</td>
-                            </tr>
-                            <tr>
-                                <td>PII Description</td>
-                                <td>A geopolitical entity was detected</td>
-                            </tr>
-                            <tr>
-                                <td>Alert score</td>
-                                <td>MEDIUM</td>
-                            </tr>
-                        </table>
+                            </table>
+
                         </span>
-
-
-
 
                     </span>
                 </div>
@@ -84,8 +47,6 @@
         </div>
     </div>
     <!-- ******************* -->
-
-
 
     <div class="row">
         <div class="col-md-3">
@@ -160,13 +121,13 @@
             tableHTML += '<tr><td>PII Text Detected</td><td>'+item['PII Detected Value']+'</td></tr>';
             tableHTML += '<tr><td>PII Type</td><td>'+item['PII Type']+'</td></tr>';
             tableHTML += '<tr><td>PII Description</td><td>'+item['PII Description']+'</td></tr>';
+            tableHTML += '<tr><td>Alert Level</td><td>'+item['Alert Name']+'</td></tr>';
             console.log(item, index);
             tableHTML += '</tbody></table>';
             $('#fieldsSpan').append(tableHTML);
         });
 
     }
-
 
 
     $(document).ready(function(){
