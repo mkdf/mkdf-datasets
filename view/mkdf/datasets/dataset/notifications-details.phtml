@@ -68,10 +68,10 @@
 
             <table class="table table-bordered table-striped table-sm">
                 <tr class="table-active">
-                    <th scope="col">Date</th>
+                    <th scope="col">Scan date</th>
                     <th scope="col">Type</th>
-                    <th scope="col">Document</th>
-                    <th>Status</th>
+                    <th scope="col">Document ID</th>
+                    <th scope="col">Document Date</th>
                     <th>Action</th>
                 </tr>
                 <?php foreach($notifications as $notification): ?>
@@ -84,10 +84,11 @@
                         <td><?= $dateString ?></td>
                         <td><?= $notification['job-type'] ?></td>
                         <td><?= $notification['document ID'] ?></td>
-                        <td><?= $notification['status'] ?></td>
+                        <!--<td><?= $notification['status'] ?></td>-->
+                        <td><!-- document date here --></td>
                         <td>
                             <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal' onclick="populateModal('<?= $notification['_id'] ?>')">
-                                <i class="fas fa-search"></i>
+                                <i class="fas fa-search"></i> View
                             </a>
                         </td>
                 </tr>
@@ -126,7 +127,7 @@
         const unixTimestamp = noti['notificationDate']; // Unix timestamp in seconds
         const dateObj = new Date(unixTimestamp * 1000); // Convert to milliseconds
         const humanDate = formatTimestamp(dateObj);
-        $('#notificationTable > tbody').append('<tr><td>Notification Date</td><td>'+humanDate+'</td></tr>');
+        $('#notificationTable > tbody').append('<tr><td>Scan date</td><td>'+humanDate+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Document ID</td><td>'+noti['docId']+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Severity</td><td>'+noti['severity']+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Description</td><td>'+noti['description']+'</td></tr>');
@@ -170,7 +171,7 @@
             fieldObj['Alert Name'] = '<?= $field['Alert Name'] ?>';
             <?php
                 if (is_array($field['PII Detected Value'])) {
-                    $detectedValue = implode(",", $field['PII Detected Value']); // convert array to string using comma separator
+                    $detectedValue = implode(", ", $field['PII Detected Value']); // convert array to string using comma separator
                 }
                 else {
                     $detectedValue = $field['PII Detected Value'];
