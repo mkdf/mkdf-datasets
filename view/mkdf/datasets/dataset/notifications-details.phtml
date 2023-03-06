@@ -70,22 +70,25 @@
                 <tr class="table-active">
                     <th scope="col">Scan date</th>
                     <th scope="col">Type</th>
-                    <th scope="col">Document ID</th>
                     <th scope="col">Document Date</th>
+                    <th scope="col">Document ID</th>
                     <th>Action</th>
                 </tr>
                 <?php foreach($notifications as $notification): ?>
                 <tr>
                     <?php
                         $date = new DateTime();
-                        $date->setTimestamp($notification['modified-by']);
-                        $dateString = $date->format('d/m/Y H:i');
+                        $date->setTimestamp($notification['modified-at']);
+                        $dateStringScan = $date->format('d/m/Y H:i');
+                        $date = new DateTime();
+                        $date->setTimestamp($notification['documentTimestamp']);
+                        $dateStringDoc = $date->format('d/m/Y H:i');
                     ?>
-                        <td><?= $dateString ?></td>
+                        <td><?= $dateStringScan ?></td>
                         <td><?= $notification['job-type'] ?></td>
+                        <td><?= $dateStringDoc ?></td>
                         <td><?= $notification['document ID'] ?></td>
                         <!--<td><?= $notification['status'] ?></td>-->
-                        <td><!-- document date here --></td>
                         <td>
                             <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal' onclick="populateModal('<?= $notification['_id'] ?>')">
                                 <i class="fas fa-search"></i> View
@@ -124,10 +127,14 @@
         var noti = notifications[notificationId];
         $('#notificationTable > tbody').empty();
         $('#notificationTable > tbody').append('<tr><td>Type</td><td>'+noti['job-type']+'</td></tr>');
-        const unixTimestamp = noti['notificationDate']; // Unix timestamp in seconds
-        const dateObj = new Date(unixTimestamp * 1000); // Convert to milliseconds
-        const humanDate = formatTimestamp(dateObj);
-        $('#notificationTable > tbody').append('<tr><td>Scan date</td><td>'+humanDate+'</td></tr>');
+        var unixTimestamp = noti['notificationDate']; // Unix timestamp in seconds
+        var dateObj = new Date(unixTimestamp * 1000); // Convert to milliseconds
+        var humanScanDate = formatTimestamp(dateObj);
+        unixTimestamp = noti['docDate'];
+        dateObj = new Date(unixTimestamp * 1000);
+        humanDocDate = formatTimestamp(dateObj);
+        $('#notificationTable > tbody').append('<tr><td>Scan date</td><td>'+humanScanDate+'</td></tr>');
+        $('#notificationTable > tbody').append('<tr><td>Document date</td><td>'+humanDocDate+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Document ID</td><td>'+noti['docId']+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Severity</td><td>'+noti['severity']+'</td></tr>');
         $('#notificationTable > tbody').append('<tr><td>Description</td><td>'+noti['description']+'</td></tr>');
@@ -155,7 +162,8 @@
         <?php foreach($notifications as $notification): ?>
         var notificationObject = {};
         notificationObject['job-type'] = '<?= $notification['job-type'] ?>';
-        notificationObject['notificationDate'] = '<?= $notification['modified-by'] ?>';
+        notificationObject['notificationDate'] = '<?= $notification['modified-at'] ?>';
+        notificationObject['docDate'] = '<?= $notification['documentTimestamp'] ?>';
         notificationObject['docId'] = '<?= $notification['document ID'] ?>';
         notificationObject['severity'] = '<?= $notification['severityScores'] ?>';
         notificationObject['description'] = '<?= $notification['description'] ?>';
