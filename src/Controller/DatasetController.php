@@ -1194,7 +1194,8 @@ class DatasetController extends AbstractActionController
             $notificationsKey = $this->config['notifications']['notifications-key'];
             $query = [
                 'dataset' => $dataset->uuid,
-                'job-type' => 'PRIVACY-VIOLATION'
+                //'job-type' => 'PRIVACY-VIOLATION'
+                '$or' => [['job-type' => 'PRIVACY-VIOLATION'],['job-type' => 'TOXICITY-NOTIFICATION']]
             ];
             $queryJSON = json_encode($query);
             $response = json_decode($this->_stream_repository->getDocuments ($notificationsDataset,999, null, $queryJSON), True);

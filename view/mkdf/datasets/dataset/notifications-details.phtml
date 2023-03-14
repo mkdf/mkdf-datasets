@@ -47,6 +47,51 @@
         </div>
     </div>
     <!-- ******************* -->
+    <div class="modal fade" id="toxicityDetailModal" tabindex="-1" aria-labelledby="toxicityDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="toxicityDetailModalLabel">Notification details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span id="toxicityDetailModalContent">
+                        <!--Modal content here-->
+
+                        <table class="table table-bordered table-striped table-sm" id="toxicityTable">
+                            <tbody>
+                            <tr>
+                                <td>Type</td>
+                                <td>TOXICITY-NOTIFICATION</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+
+                        <hr />
+                        <h6>Document Fields</h6>
+
+                        <span id="toxicityFieldsSpan">
+                            <table class="table table-bordered table-striped table-sm" id="toxicityFieldsTable">
+                            <tr>
+                                <td>Field name</td>
+                                <td>field_name</td>
+                            </tr>
+                            </table>
+
+                        </span>
+
+                    </span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ******************* -->
 
     <div class="row">
         <div class="col-md-3">
@@ -90,9 +135,17 @@
                         <td><?= $notification['document ID'] ?></td>
                         <!--<td><?= $notification['status'] ?></td>-->
                         <td>
-                            <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal' onclick="populateModal('<?= $notification['_id'] ?>')">
-                                <i class="fas fa-search"></i> View
-                            </a>
+                            <?php if($notification['job-type'] == 'PRIVACY-VIOLATION'): ?>
+                                <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#notificationDetailModal' onclick="populateModal('<?= $notification['_id'] ?>')">
+                                    <i class="fas fa-search"></i> View
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if($notification['job-type'] == 'TOXICITY-NOTIFICATION'): ?>
+                                <a class="btn btn-sm btn-primary" href="#" data-toggle='modal' data-target='#toxicityDetailModal' onclick="populateModal('<?= $notification['_id'] ?>')">
+                                    <i class="fas fa-search"></i> View
+                                </a>
+                            <?php endif; ?>
                         </td>
                 </tr>
                 <?php endforeach; ?>
@@ -123,7 +176,7 @@
         return output;
     }
 
-    function populateModal(notificationId) {
+    function populatePII(notificationId) {
         var noti = notifications[notificationId];
         $('#notificationTable > tbody').empty();
         $('#notificationTable > tbody').append('<tr><td>Type</td><td>'+noti['job-type']+'</td></tr>');
@@ -153,7 +206,46 @@
             tableHTML += '</tbody></table>';
             $('#fieldsSpan').append(tableHTML);
         });
+    }
 
+    function populateToxicity(notificationId) {
+        var noti = notifications[notificationId];
+        $('#toxicityTable > tbody').empty();
+        $('#toxicityTable > tbody').append('<tr><td>Type</td><td>'+noti['job-type']+'</td></tr>');
+        var unixTimestamp = noti['notificationDate']; // Unix timestamp in seconds
+        var dateObj = new Date(unixTimestamp * 1000); // Convert to milliseconds
+        var humanScanDate = formatTimestamp(dateObj);
+        unixTimestamp = noti['docDate'];
+        dateObj = new Date(unixTimestamp * 1000);
+        humanDocDate = formatTimestamp(dateObj);
+        $('#toxicityTable > tbody').append('<tr><td>Scan date</td><td>'+humanScanDate+'</td></tr>');
+        $('#toxicityTable > tbody').append('<tr><td>Document date</td><td>'+humanDocDate+'</td></tr>');
+        $('#toxicityTable > tbody').append('<tr><td>Document ID</td><td>'+noti['docId']+'</td></tr>');
+        $('#toxicityTable > tbody').append('<tr><td>Description</td><td>'+noti['description']+'</td></tr>');
+
+        $('#toxicityFieldsSpan').empty();
+
+        noti['Fields'].forEach(function (item, index) {
+            tableHTML = '<table class="table table-bordered table-striped table-sm"><tbody>';
+            tableHTML += '<tr><td>Field name</td><td>'+item['Field Name']+'</td></tr>';
+            tableHTML += '<tr><td>Field Value</td><td>'+item['Value']+'</td></tr>';
+            tableHTML += '<tr><td>Toxicity</td><td>'+item['Toxicity']+'</td></tr>';
+            tableHTML += '<tr><td>Obscene</td><td>'+item['Obscene']+'</td></tr>';
+            tableHTML += '<tr><td>Insult</td><td>'+item['Insult']+'</td></tr>';
+            console.log(item, index);
+            tableHTML += '</tbody></table>';
+            $('#toxicityFieldsSpan').append(tableHTML);
+        });
+    }
+
+    function populateModal(notificationId) {
+        var noti = notifications[notificationId];
+        if (noti['job-type'] == 'PRIVACY-VIOLATION'){
+            populatePII(notificationId);
+        }
+        if (noti['job-type'] == 'TOXICITY-NOTIFICATION'){
+            populateToxicity(notificationId);
+        }
     }
 
 
@@ -170,24 +262,43 @@
         notificationObject['Fields'] = [];
 
             <?php foreach ($notification['Fields'] as $field): ?>
-            var fieldObj = [];
-            fieldObj['Field Name'] = '<?= $field['Field Name'] ?>';
-            fieldObj['Value'] = '<?= $field['Value'] ?>';
-            fieldObj['PII Type'] = '<?= $field['PII Type'] ?>';
-            fieldObj['PII Description'] = '<?= $field['PII Description'] ?>';
-            fieldObj['Alert Score'] = '<?= $field['Alert Score'] ?>';
-            fieldObj['Alert Name'] = '<?= $field['Alert Name'] ?>';
-            <?php
-                if (is_array($field['PII Detected Value'])) {
-                    $detectedValue = implode(", ", $field['PII Detected Value']); // convert array to string using comma separator
-                }
-                else {
-                    $detectedValue = $field['PII Detected Value'];
-                }
-            ?>
-            fieldObj['PII Detected Value'] = '<?= $detectedValue ?>';
+                <?php if ($notification['job-type'] == 'PRIVACY-VIOLATION'): ?>
+                    var fieldObj = [];
+                    fieldObj['Field Name'] = '<?= $field['Field Name'] ?>';
+                    fieldObj['Value'] = '<?= $field['Value'] ?>';
+                    fieldObj['PII Type'] = '<?= $field['PII Type'] ?>';
+                    fieldObj['PII Description'] = '<?= $field['PII Description'] ?>';
+                    fieldObj['Alert Score'] = '<?= $field['Alert Score'] ?>';
+                    fieldObj['Alert Name'] = '<?= $field['Alert Name'] ?>';
+                    <?php
+                    if (is_array($field['PII Detected Value'])) {
+                        $detectedValue = implode(", ", $field['PII Detected Value']); // convert array to string using comma separator
+                    }
+                    else {
+                        $detectedValue = $field['PII Detected Value'];
+                    }
+                    ?>
+                    fieldObj['PII Detected Value'] = '<?= $detectedValue ?>';
 
-            notificationObject['Fields'].push(fieldObj);
+                    notificationObject['Fields'].push(fieldObj);
+                <?php endif; ?>
+
+
+                <?php if ($notification['job-type'] == 'TOXICITY-NOTIFICATION'): ?>
+                    var fieldObj = [];
+                    fieldObj['Field Name'] = '<?= $field['Field Name'] ?>';
+                    fieldObj['Value'] = '<?= $field['Value'] ?>';
+                    fieldObj['Toxicity'] = '<?= $field['toxicity']['toxicity'] ?>';
+                    fieldObj['Obscene'] = '<?= $field['toxicity']['obscene'] ?>';
+                    fieldObj['Insult'] = '<?= $field['toxicity']['insult'] ?>';
+
+                    notificationObject['Fields'].push(fieldObj);
+                <?php endif; ?>
+
+
+
+
+
             <?php endforeach; ?>
 
         notifications['<?= $notification['_id'] ?>'] = notificationObject;
